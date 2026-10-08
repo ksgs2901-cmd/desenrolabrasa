@@ -157,9 +157,38 @@ http.createServer(async (req, res) => {
 
   // ── PROXY: BlackCat - Criar PIX ─────────────────────────────────────────
   if (pathname === '/proxy/blackcat/create') {
-    const body = await readBodyBuffer(req);
-    console.log('[BLACKCAT] Criando venda:', body.toString().substring(0, 150));
+    const rawBody = await readBodyBuffer(req);
+    console.log('[BLACKCAT] Payload recebido:', rawBody.toString().substring(0, 200));
     try {
+      const inp = JSON.parse(rawBody.toString('utf8'));
+
+      // Transforma o payload do frontend para o formato da BlackCat API
+      const amount   = inp.payment_amount || 6892;
+      const nomePix  = (inp.customer && inp.customer.name)     || 'Cliente';
+      const email    = (inp.customer && inp.customer.email)    || 'cliente@gmail.com';
+      const phone    = ((inp.customer && inp.customer.phone)   || '11999999999').replace(/\D/g, '');
+      const cpfNum   = ((inp.customer && inp.customer.document)|| '00000000000').replace(/\D/g, '');
+      const extCode  = inp.external_code || ('DR-' + Date.now());
+      const prodName = (inp.items && inp.items[0] && inp.items[0].name) || 'Pagamento Seguro';
+
+      const payload = JSON.stringify({
+        amount:        amount,
+        currency:      'BRL',
+        paymentMethod: 'pix',
+        items:         [{ title: prodName, quantity: 1, tangible: false }],
+        customer: {
+          name:     nomePix,
+          email:    email,
+          phone:    phone,
+          document: { number: cpfNum, type: 'cpf' }
+        },
+        pix:         { expiresInDays: 1 },
+        externalRef: extCode
+      });
+
+      const payloadBuf = Buffer.from(payload, 'utf8');
+      console.log('[BLACKCAT] Enviando para API:', payload.substring(0, 200));
+
       const r = await httpsReq({
         hostname: 'api.blackcatoficial.com',
         path: '/api/sales/create-sale',
@@ -168,9 +197,10 @@ http.createServer(async (req, res) => {
           'Content-Type': 'application/json',
           'X-API-Key': BLACKCAT_SK,
           'Accept': 'application/json',
-          'Content-Length': body.length
+          'Content-Length': payloadBuf.length
         }
-      }, body);
+      }, payloadBuf);
+
       console.log('[BLACKCAT] Status:', r.status, r.bodyStr.substring(0, 300));
       res.writeHead(r.status, { 'Content-Type': 'application/json', ...CORS });
       res.end(r.body);
