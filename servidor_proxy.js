@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const url = require('url');
 
-const base = 'C:/Users/khsx2/Downloads/desenrola_extraido';
+const base = path.join(__dirname);
 const mime = {
   'html':'text/html;charset=utf-8','css':'text/css','js':'application/javascript',
   'png':'image/png','jpg':'image/jpeg','jpeg':'image/jpeg','gif':'image/gif',
@@ -215,4 +215,4 @@ http.createServer(async (req, res) => {
   }
   serveFile(fp, req, res);
 
-}).listen(8080, () => console.log('Servidor rodando em http://localhost:8080'));
+}).listen(process.env.PORT || 8080, () => console.log('Servidor rodando em http://localhost:' + (process.env.PORT || 8080)));
